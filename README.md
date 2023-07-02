@@ -333,7 +333,7 @@
 
 ![单链表示意图](C:\Users\Administrator\Desktop\数据结构和算法\img\singleLinkList.png)
 
-### 单项链表注意事项
+#### 单项链表注意事项
 
 1. **一定注意头节点不能修改，也不能存储数据**，因此需要**遍历**操作时需准备一个**临时变量存储头节点信息**然后进行遍历操作
 
@@ -435,7 +435,7 @@
 
 
 
-### 单链表顺序插入实现思路
+#### 单链表顺序插入实现思路
 
 1. 找到**新添加节点id**的**上**一个节点
 
@@ -489,7 +489,7 @@
 
 
 
-### 链表节点的修改及其注意事项
+#### 链表节点的修改及其注意事项
 
 - **实现思路**：
 
@@ -534,13 +534,261 @@
 
 
 
-### 单链表节点的删除
+#### 单链表节点的删除
 
 - **节点删除实现思路**：
   1. 根据传入的**id**找到**对应的节点**，但是**temp**对应的一定得是**上一个节点**，因为**单链表**的**temp**如果**指向了目标节点**的话就**删除不了**了
   2. 将**temp**节点的**next**指向目标节点的下一个节点`temp.next = temp.next.next`
 - **注意事项**：
   - 上述删除操作是**直接改变next的指向**，**被删除的节点**由于**没有变量指向其对应的内存地址**，会**被垃圾回收机制回收**
+
+#### 单链表面试题
+
+- 腾讯面试题：单链表的反转
+
+- 实现思路：
+      1. 先定义一个节点作为反转节点的头部：`reverseHead = new HeroNode( )`
+          2. 遍历原来的链表，每遍历一个节点，就将其取出放在新链表`reverseHead`的最前端
+          3. 将原来的链表的`head.next = reverseHead.next`
+
+  ```js
+  // 腾讯面试题，单链表的反转
+  /* 
+      实现思路：
+          1. 先定义一个节点作为反转节点的头部：reverseHead = new HeroNode()
+          2. 遍历原来的链表，每遍历一个节点，就将其取出放在新链表reverseHead的最前端
+          3. 将原来的链表的head.next = reverseHead.next
+  */
+  
+  function reverseLinkList(headNode){
+      // 有效节点为空或只有一个有效节点直接返回
+      if(headNode.next == null || headNode.next.next == null)return
+      // 准备临时变量保存第一个有效节点
+      let temp = headNode.next
+      // 准备临时变量保存temp的下一个节点
+      let next = null
+      // 准备用于反转的链表头节点
+      let reverseHead = new heroNode()
+      // 遍历旧链表
+      while(temp != null){
+          // 先保存当前节点的下一个节点
+          next = temp.next
+          // 将当前节点的下一个节点指向新链表的最前端
+          temp.next = reverseHead.next
+          // 将新链表的第一个节点指向temp节点(此时的temp.next = reverseHead.next)
+          reverseHead.next = temp
+          // 将当前节点后移
+          temp = next
+      }
+      // 将原链表头节点的next指向新链表头节点的next
+      headNode.next = reverseHead.next
+  }
+  ```
+
+
+
+
+
+### 双向链表的特点
+
+- 单向链表只能沿着一个方向查找，而**双向链表**可以**双向查找**
+
+- 双向链表的**删除**可以**直接找到待删除节点**，然后将其上下节点相连，使其自我删除`temp.pre.next = temp.next | temp.next.pre = temp.pre`,这里要注意如果**temp是最后一个节点**，那么**temp.next就是null**，此时执行`temp.next.pre = temp.pre`就会出错，因此这中情况要先判断，`temp.next ！= null`才执行
+
+- **注意**双向链表的**顺序添加**
+
+  ```js
+      // 双向链表的添加--顺序添加
+      addNodeByOrder(node){
+          let temp = this.head
+          // 添加的节点是否存在的标志，默认为false
+          let flag = false
+          while(true){
+              if(temp.next == null)break
+              if(temp.next.id > node.id){
+                  break
+              }else if(temp.next.id == node.id){
+                  flag = true
+                  break
+              }
+              temp = temp.next
+          }
+          if(flag){
+              console.log("节点已存在，无法重复添加");
+          }else{
+              if(typeof temp.next == 'undefined' || temp.next == null){
+                  temp.next = node
+                  node.pre = temp
+              }else{
+              // 先将node.next指向temp.next
+              node.next = temp.next
+              // 再将temp.next.pre指向node
+              temp.next.pre = node
+              // 然后将temp.next指向node
+              temp.next = node
+              // 最后将node.pre指向temp
+              node.pre = temp
+              }
+  
+          }
+      }
+  ```
+
+  
+
+- **全部代码示例**
+
+  ```js
+  // 双向链表
+  class heroNode {
+    // data域
+    id;
+    name;
+    skin;
+    // next域--指向下一个节点
+    next;
+    // pre域--指向前一个节点
+    pre;
+  
+    // 构造函数
+    constructor(id, name, skin) {
+      this.id = id;
+      this.name = name;
+      this.skin = skin;
+    }
+  
+    // 重写toString方法，便于显示
+    toString() {
+      return [`id:${this.id} name:${this.name} skin:${this.skin}`];
+    }
+  }
+  
+  class doubleLinkList{
+      // 初始化双向链表的头
+      head = new heroNode(0,'','')
+  
+      // 遍历双向链表
+      showDoubleList(head){
+          if(this.head.next==null){
+              console.log("链表为空");
+              return
+          }
+          let temp = head
+          while(true){
+              console.log(temp.toString());
+              if(temp.next == null)break
+              temp = temp.next
+          }
+      }
+      
+      // 获取表头
+      getHead(){
+          return this.head
+      }
+  
+      // 双向链表的添加--只考虑末尾添加
+      addNode(node){
+          let temp = this.head
+          while(true){
+              if(temp.next == null)break
+              temp = temp.next
+          }
+          // 出了while循环后就说明已经找到最后一个节点
+          // 双向绑定
+          temp.next = node
+          node.pre = temp
+      }
+  	
+  	    // 双向链表的添加--顺序添加
+      addNodeByOrder(node){
+          let temp = this.head
+          // 添加的节点是否存在的标志，默认为false
+          let flag = false
+          while(true){
+              if(temp.next == null)break
+              if(temp.next.id > node.id){
+                  break
+              }else if(temp.next.id == node.id){
+                  flag = true
+                  break
+              }
+              temp = temp.next
+          }
+          if(flag){
+              console.log("节点已存在，无法重复添加");
+          }else{
+              if(typeof temp.next == 'undefined' || temp.next == null){
+                  temp.next = node
+                  node.pre = temp
+              }else{
+              // 先将node.next指向temp.next
+              node.next = temp.next
+              // 再将temp.next.pre指向node
+              temp.next.pre = node
+              // 然后将temp.next指向node
+              temp.next = node
+              // 最后将node.pre指向temp
+              node.pre = temp
+              }
+  
+          }
+      }
+  
+      // 双向链表的修改
+      changeNode(id,name,skin){
+          if(this.head.next == null){
+              console.log("链表为空");
+              return
+          }
+          let temp = this.head.next
+          while(true){
+              if(temp.id == id)break
+              temp = temp.next
+          }
+          temp.name = name
+          temp.skin = skin
+      }
+  
+      // 双向链表的删除
+      deleteNode(id){
+          if(this.head.next == null || id==0){
+              console.log("链表为空或删除的对象为链表的头节点，无法删除");
+              return
+          }
+          let temp = this.head.next
+          while(true){
+              if(temp.id == id)break
+              temp = temp.next
+          }
+          // 此时的temp就是待删除节点
+          // 自我删除
+          temp.pre.next = temp.next
+          // 这里如果temp是最后一个节点就会出现问题
+          // temp.next.pre = temp.pre
+          if(temp.next!=null)temp.next.pre = temp.pre
+      }
+  }
+  
+  // 创建节点
+  let node1 = new heroNode(1, "元歌", "午夜歌剧院");
+  let node2 = new heroNode(2, "韩信", "街头霸王");
+  let node3 = new heroNode(3, "李白", "千年之狐");
+  let node4 = new heroNode(4, "孙悟空", "美猴王");
+  // 创建双向链表
+  let doubleList = new doubleLinkList()
+  // 添加节点
+  doubleList.addNode(node3)
+  doubleList.addNode(node2)
+  doubleList.addNode(node4)
+  doubleList.addNode(node1)
+  // 删除节点
+  doubleList.deleteNode(4)
+  // 遍历节点
+  doubleList.showDoubleList(doubleList.getHead())
+  
+  ```
+
+  
 
 
 
