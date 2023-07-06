@@ -932,5 +932,447 @@
 
 ## 栈(stack)
 
+#### 栈的定义
 
+1. 栈是一个**后入先出**的有序列表
+2. 栈(stack)是**限制线性表中元素的插入和删除只能在一端**的数据结构，这一端在**变化**，可插入和删除，叫做**栈顶**，另一端叫**栈底**
+
+#### 数组模拟栈的思路
+
+1. 初始化一个数组(stack)，定义一个**top**指针，初始时为**-1**
+2. **入栈**（push）时，先将`top++`,然后赋值`stack[i] = data`
+3. **出栈**（pop）时，由于需要**返回出栈的数据**，因此**先**创建一个临时变量存储栈顶的数据`temp = stack[top]`,**然后**`top--`，**最后**`return temp`即可
+4. 栈的**遍历**，遍历时，注意数据是从**栈顶开始遍历**
+
+#### 数组模拟栈的代码实现
+
+```js
+// 数组模拟栈
+class arrayStack {
+  top; // top指针,初始为-1
+  stack; // 数组模拟的栈
+  maxSize; // 栈的大小
+
+  // 构造函数初始化
+  constructor(maxSize) {
+    this.top = -1;
+    this.stack = [];
+    this.maxSize = maxSize;
+  }
+
+  // 判断栈满
+  isFull() {
+    return this.top == this.maxSize - 1;
+  }
+  // 判断栈空
+  isEmpty() {
+    return this.top == -1;
+  }
+
+  // 入栈（push）
+  push(data) {
+    if (this.isFull()) {
+      console.log("栈满，无法入栈");
+      return;
+    }
+    this.top++;
+    this.stack[this.top] = data;
+  }
+
+  // 出栈（pop）
+  pop() {
+    if (this.isEmpty()) {
+      console.log("栈空，无法出栈");
+      return;
+    }
+    let value = this.stack[this.top];
+    this.top--;
+    return value;
+  }
+
+  // 栈的遍历（注意数据从栈顶开始显示）
+  list() {
+    if (this.isEmpty()) {
+      console.log("栈空，无法遍历");
+      return;
+    }
+    for (let i = this.top; i >= 0; i--) {
+      console.log(this.stack[i]);
+    }
+  }
+}
+
+let stack = new arrayStack(5);
+
+for (let i = 0; i < 5; i++) {
+  stack.push(i);
+}
+
+let s1 = stack.pop()
+let s2 = stack.pop()
+let s3 = stack.pop()
+let s4 = stack.pop()
+console.log("@@@",s1,s2,s3,s4);
+stack.list();
+
+```
+
+
+
+#### 使用栈完成中缀表达式计算器功能
+
+- **情景描述**：接收一个形如:`2*5*3+2-1`的**表达式**，计算其结果
+
+- **实现思路**：
+
+  1. 准备两个栈，一个**数栈**（numStack），一个**符号栈**（operStack）
+  2. 通过一个**index**索引遍历表达式，当遍历到的是一个**数字**时，就直接将其入**数栈**
+  3. 当遍历到的是一个**符号**时：
+     1. 如果当前符号栈为**空**，注意可能是**多位数**，需要**特殊处理**,即需要**再向表达式后再看一位**然后处理
+     2. 如果当前符号栈**有操作符**，则对**当前操作符**和**栈中的操作符**进行**比较**，**如果当前操作符的优先级小于或等于栈中的操作符**，则从**数栈**中pop出两个数，从**符号栈中**pop出一个操作符，将其进行**运算**，将得到的**结果存入数栈**，接着**将当前的操作符存入符号栈**；**如果当前的操作符的优先级大于栈中的操作符，则直接将其入符号栈**。
+  4. 当整个**表达式遍历结束**后，就**顺序**的从**数栈和符号栈**中pop出相应的数和操作符，然后**运算**
+  5. **最后**在**数栈**中**只有一个数据**，这个数据就是**运算结果**
+
+- **代码实现**：
+
+  ```js
+  // 栈模拟计算器
+  class arrayStack {
+    top; // top指针,初始为-1
+    stack; // 数组模拟的栈
+    maxSize; // 栈的大小
+  
+    // 构造函数初始化
+    constructor(maxSize) {
+      this.top = -1;
+      this.stack = [];
+      this.maxSize = maxSize;
+    }
+  
+    // 判断栈满
+    isFull() {
+      return this.top == this.maxSize - 1;
+    }
+    // 判断栈空
+    isEmpty() {
+      return this.top == -1;
+    }
+  
+    // 获取栈顶数据但不出栈
+    pickTop() {
+      return this.stack[this.top];
+    }
+  
+    // 入栈（push）
+    push(data) {
+      if (this.isFull()) {
+        console.log("栈满，无法入栈");
+        return;
+      }
+      this.top++;
+      this.stack[this.top] = data;
+    }
+  
+    // 出栈（pop）
+    pop() {
+      if (this.isEmpty()) {
+        console.log("栈空，无法出栈");
+        return;
+      }
+      let value = this.stack[this.top];
+      this.top--;
+      return value;
+    }
+  
+    // 栈的遍历（注意数据从栈顶开始显示）
+    list() {
+      if (this.isEmpty()) {
+        console.log("栈空，无法遍历");
+        return;
+      }
+      for (let i = this.top; i >= 0; i--) {
+        console.log(this.stack[i]);
+      }
+    }
+  }
+  
+  // 返回运算符的优先级--目前只支持+-*/
+  function priority(oper) {
+    if (oper == "*" || oper == "/") {
+      return 1;
+    } else if ((oper = "+" || oper == "-")) {
+      return 0;
+    } else {
+      return -1;
+    }
+  }
+  
+  // 判断是否为一个合法的运算符
+  function isOper(oper) {
+    return oper == "+" || oper == "-" || oper == "*" || oper == "/";
+  }
+  
+  // 计算方法
+  function CalculateNum(num1, num2, oper) {
+    // 数据校验
+    if (!isOper(oper)) {
+      console.log("操作符有误，无法运算");
+      return;
+    }
+    // 存储运算结果
+    let result = 0;
+    switch (oper) {
+      case "+":
+        result = num2 + num1;
+        break;
+      case "-":
+        result = num2 - num1;
+        break;
+      case "*":
+        result = num2 * num1;
+        break;
+      case "/":
+        result = num2 / num1;
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
+  
+  // 计算表达式
+  function Calculate(expression) {
+    if (typeof expression != "string") return;
+    // 准备两个栈   数栈、符号栈
+    let numStack = new arrayStack(10);
+    let operStack = new arrayStack(10);
+    // 准备index索引遍历表达式
+    let index = 0;
+    // 存储遍历读出的字符
+    let char = "";
+    // 处理多位数
+    let keepChar = "";
+  
+    // 遍历表达式
+    while (true) {
+      // 读取表达式的字符
+      char = expression.charAt(index);
+      // 根据字符进行判断
+      if (isOper(char)) {
+        // 是运算符--再判断当前符号栈是否为空
+        if (operStack.isEmpty()) {
+          // 为空--直接将符号入栈
+          operStack.push(char);
+        } else {
+          // 不为空--比较优先级
+          if (priority(char) <= priority(operStack.pickTop())) {
+            // 当前操作符的优先级小于等于符号栈中的优先级--需要运算
+            // 从数栈中取出两个数
+            let num1 = numStack.pop();
+            let num2 = numStack.pop();
+            // 从符号栈中取出一个运算符
+            let oper = operStack.pop();
+            // 运算获取结果
+            let result = CalculateNum(num1, num2, oper);
+            // 将运算结果存入数栈
+            numStack.push(result);
+            // 将当前操作符入符号栈
+            operStack.push(char);
+          } else {
+            // 当前操作符的优先级大于符号栈中的优先级--直接存入
+            operStack.push(char);
+          }
+        }
+      } else {
+        // 是数字--需要注意判断是不是多位数
+        // 先合并数
+        keepChar += char;
+        // 判断是不是最后一位
+        if (index == expression.length - 1) {
+          // 最后一位，直接入栈
+          numStack.push(+keepChar);
+          // 情况keepChar
+          keepChar = "";
+        } else {
+          // 不是最后一位
+          // 如果是数字，需要考虑是不是多位数，因此还要再往后看一位
+          if (isOper(expression.charAt(index + 1))) {
+            // 下一位是运算符--入栈
+            numStack.push(+keepChar);
+            keepChar = "";
+          }
+        }
+      }
+      // 判断完后将索引++
+      index++;
+      // 判断是否遍历结束
+      if (index > expression.length - 1) break;
+    }
+  
+    // 运算结束后，再将数栈和符号栈中的数据顺序取出进行运算
+    while (true) {
+      let num1 = numStack.pop();
+      let num2 = numStack.pop();
+      let oper = operStack.pop();
+      // 运算
+      let result = CalculateNum(num1, num2, oper);
+      // 将运算结果存入数栈
+      numStack.push(+result);
+      // 判断是否运算结束--看符号栈是否为空
+      if (operStack.isEmpty()) break;
+    }
+  
+    // 经过上述运算后，数栈中还剩最后一个数，这个数就是最终结果
+    console.log("表达式 " + expression + " =", numStack.pop());
+  }
+  
+  let expression = "900+2*9-0";
+  
+  Calculate(expression);
+  
+  ```
+
+
+
+#### 前缀表达式（波兰表达式）
+
+- **前缀表达式的计算机求值**：**从右至左**扫描表达式，当**遇到数字时**，将数字压入堆栈，**遇到运算符时**，弹出栈顶的两个数，用运算符对它们做相应的计算（栈顶元素和次顶元素），并**将结果入栈**；**重复上述过程**直到表达式**最左端**，最后运算得出的值即为表达式的结果。`eg: (3 + 4) * 5 - 6`对应的**前缀表达式**为：`- * + 3 4 5 6`
+- **为什么要使用前缀表达式或者后缀表达式**？中缀表达式对我们人来说确实很好理解和使用，但是对计算机来说并不容易操作，因此在计算时我们往往会将中缀表达式转换为其他表达式来进行运算（一般转为**后缀表达式**）
+- **中缀表达式如何转换为前缀表达式**？
+1. 按照运算符的**优先级**，对**所有**的运算单位加括号（注意**每个**运算符都要有）
+  2. 从**最里面**的运算符**开始**，依次把运算符号移动到对应的括号**前面**
+  3. 最后把括号都去掉
+  4. **例如**：`(3+4)*5-6  `    加括号：`(((3+4)*5)-6) `  移符号：`  -(*(+(3 4)5)6) `   去括号：`- * + 3 4 5 6`
+
+#### 后缀表达式（逆波兰表达式）
+
+- 与前缀表达式相似，只是运算符位于操作数**之后**`eg: (3 + 4) * 5 - 6`对应的**后缀表达式**为：`3 4 + 5 * 6 -`
+
+- **后缀表达式的计算机求值**：**从左至右**扫描表达式，**遇到数字时**，将数字压入堆栈，**遇到运算符时**，弹出栈顶的两个数（栈顶元素和次顶元素），用运算符对它们做相应的计算，并**将结果入栈**；重复上述过程**直到表达式最右端**，最后运算得出的值即为表达式的结果
+
+- **代码实现**：
+
+  ```js
+  // 逆波兰表达式计算
+  function suffixCalculate(expression) {
+    // 用于运算的值
+    let stack = new arrayStack(10);
+    // 将表达式转数组
+    let arr = expression.split(" ");
+    // 遍历数组
+    for (let i = 0; i < arr.length; i++) {
+      if(isOper(arr[i])){
+          // 是运算符--计算后将结果入栈
+          let num1 = stack.pop()
+          let num2 = stack.pop()
+          let result = CalculateNum(num1,num2,arr[i])
+          stack.push(+result)
+      }else{
+          // 是数字--直接入栈
+          stack.push(+arr[i])
+      }
+     
+    }
+    // 运算结束后取出结果
+    let result = stack.pop()
+    console.log(result);
+  }
+  
+  let expression = "3 4 + 5 * 6 -";
+  suffixCalculate(expression);// 29
+  ```
+
+  
+
+#### 中缀表达式转后缀表达式
+
+- **中缀表达式如何转换为后缀表达式**？
+
+  1. 按照运算符的**优先级**，对**所有**的运算单位加括号（注意**每个**运算符都要有）
+  2. 从**最里面**的运算符**开始**，依次把运算符号移动到对应的括号**后面**
+  3. 最后把括号都去掉
+  4. **例如**：`(3+4)*5-6  `    加括号：`(((3+4)*5)-6) `  移符号：`  (((3 4)+5)*6)- `   去括号：`3 4 + 5 * 6 -`
+
+- **计算机实现思路**：
+
+  1. **初始化两个栈**：**运算符栈**s1和**存储中间结果的栈**s2
+  2. **从左至右**扫描中缀表达式
+  3. 遇到**操作数**时，将其压入s2
+  4. 遇到**运算符**时，**比较**其与运算符栈s1栈顶运算符的**优先级**：
+     1. 如果**s1为空**，或**栈顶运算符为左括号“ ( ”**，则**直接**将其**入栈s1**
+     2. 若优先级**比栈顶运算符高**，也**直接**将其**入栈s1**（括号不算运算符）
+     3. 如果优先级**比栈顶运算符低**，则**将s1栈顶的运算符弹出压入s2**，**再次回到步骤(4-1)进行比较**
+  5. 遇到**括号**时：
+     1. 如果是**左括号**"（ "，则直接压入s1
+     2. 如果是**右括号**" ）"，则依次弹出s1栈顶的运算符，并压入s2，直到左括号为止，此时将这一对括号**丢弃**
+  6. 重复步骤2-5，**直到表达式的最右边**
+  7. 将s1中剩余的运算符**依次弹出并压入s2**
+  8. 依次弹出s2中的元素并输出，**结果的逆序及为中缀表达式对应的后缀表达式**
+  
+- **代码实现**：
+
+  ```js
+  import { priority, isOper, getArrayStack } from "./utils.js";
+  let arrayStack = getArrayStack();
+  
+  // 中缀表达式转后缀表达式
+  function infixToSuffix(infix) {
+    if (typeof infix != "string") return;
+    // 初始化两个栈
+    let s1 = new arrayStack(10);
+    let s2 = new arrayStack(10);
+    // 将字符串分割为数组
+    let arr = infix.split(" ");
+    // 遍历数组
+    for (let i = 0; i < arr.length; i++) {
+      if (isOper(arr[i])) {
+        // 运算符--比较优先级
+        if (s1.isEmpty() || arr[i] == "(") {
+          // s1为空或运算符为左括号“（”  -- 直接入s1
+          s1.push(arr[i]);
+        } else if (priority(arr[i]) >= priority(s1.pickTop())) {
+          // 优先级比栈顶运算符高--直接入栈s1
+          s1.push(arr[i]);
+        } else if (priority(arr[i]) < priority(s1.pickTop())) {
+          // 优先级比栈顶运算符低--将s1栈顶运算符取出压入s2
+          let oper = s1.pop();
+          s2.push(oper);
+        }
+      } else if (arr[i] == "(") {
+        // 左括号
+        s1.push(arr[i]);
+      } else if (arr[i] == ")") {
+        // 右括号--依次弹出s1栈顶的运算符并压入s2，直到左括号
+        while (true) {
+          let oper = s1.pop();
+          if (oper == "(") break;
+          s2.push(oper);
+        }
+      } else {
+        // 操作数
+        s2.push(arr[i]);
+      }
+    }
+    // 将s1中的运算符依次压入s2
+    while(true){
+      if(s1.isEmpty())break
+      let oper = s1.pop()
+      s2.push(oper)
+    }
+  
+    // 输出s1
+    s2.reverseList();
+  }
+  
+  let infix = "1 + ( ( 2 + 3 ) * 4 ) - 5";
+  
+  infixToSuffix(infix);
+  
+  ```
+
+  
+
+
+
+### 递归
 
