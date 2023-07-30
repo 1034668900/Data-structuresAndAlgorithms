@@ -75,3 +75,5 @@ function findWay(map, i, j) {
 // 递归回溯找终点
 findWay(map,1,1)
 
+console.log("@@@",map);
+

@@ -8,7 +8,7 @@ let rawArr = [
 
 function toSparseArr(arr) {
   // 数据校验
-  if (!arr instanceof Array) return;
+  if (!(arr instanceof Array)) return;
   // 记录原始数组中有效数据个数
   let sum = 0;
   for (let i = 0; i < arr.length; i++) {
@@ -42,7 +42,7 @@ function toSparseArr(arr) {
 
 function toArray(sparseArr){
     // 合法性判断
-    if(!sparseArr instanceof Array)return
+    if(!(sparseArr instanceof Array))return
     // 读取稀疏数组第一行创建原始数组
     let row = sparseArr[0][0]// 行
     let col = sparseArr[0][1]// 列

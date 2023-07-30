@@ -25,7 +25,7 @@
   ```js
   function toSparseArr(arr) {
     // 数据校验
-    if (!arr instanceof Array) return;
+    if (!(arr instanceof Array)) return;
     // 记录原始数组中有效数据个数
     let sum = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -68,7 +68,7 @@
   ```js
   function toArray(sparseArr){
       // 合法性判断
-      if(!sparseArr instanceof Array)return
+      if(!(sparseArr instanceof Array))return
       // 读取稀疏数组第一行创建原始数组
       let row = sparseArr[0][0]// 行
       let col = sparseArr[0][1]// 列
@@ -1391,8 +1391,8 @@ stack.list();
   1. 执行一个方法时，就创建一个新的受保护的独立空间（栈空间）
   2. 方法的局部变量是独立的，不会相互影响，比如n变量
   3. 如果方法中使用的是引用类型变量，就会共享该引用类型的数据
-  4. 递归必须向退出递归的条件逼近，否则就是无线递归（死龟）
-  5. 当一个方法执行完毕，或者遇到return，就会返回，遵循谁调用，就将结果返回给谁，同时当方法执行完毕或者返回时，该方法也就执行完毕
+  4. 递归必须向退出递归的条件逼近，否则就是无线递归（死归）
+  5. 当一个方法执行完毕，或者遇到**return**，就会返回，遵循**谁调用**，就将**结果返回给谁**，同时当方法执行完毕或者返回时，该方法也就执行完毕
 - **递归能解决什么样的问题？**
   1. 各种数学问题：八皇后、汉诺塔、阶乘问题、迷宫问题已经球和篮子问题等等
   2. 各种算法中也会使用到递归：快排、归并排序、二分查找、分治算法等
@@ -1569,7 +1569,7 @@ findWay(map,1,1)
   
   ```
 
-<<<<<<< HEAD
+
 
 
 
@@ -1582,7 +1582,7 @@ findWay(map,1,1)
 
 #### 时间复杂度
 
-1. 一般情况下，算法中的基本操作语句的重复执行次数是问题规模n的某个函数，用T(n)表示，若有某个辅助函数f(n)，使得当n趋近于无穷大时，T(n)/f(n)的极限值为不等于0的常数，则称f(n)是T(n)的同数量级函数，记作T(n) = O(f(n)),称O(f(n))为算法的**渐进时间复杂度**，简称**时间复杂度**。
+1. 一般情况下，算法中的基本操作语句的重复执行次数是问题规模n的某个函数，用T(n)表示，若有某个辅助函数f(n)，使得当n趋近于无穷大时，**T(n)/f(n)**的极限值为不等于0的常数，则称f(n)是T(n)的同数量级函数，记作T(n) = O(f(n)),称O(f(n))为算法的**渐进时间复杂度**，简称**时间复杂度**。
 2. T(n)不同，但时间复杂度可能相同。如：`T(n) = n^2 + 7n + 6 `与 `T(n) = 3n^2 + 2n + 2`的T(n)不同，但是时间复杂度相同，都为O(n^2)。
 3. 计算时间复杂度的方法：
    1. 用常数1代替运行时间中的所有加法常数 T(n) = n^2 + 7n + 6  -> T(n) = n^2 + 7n + 1
@@ -1612,7 +1612,7 @@ findWay(map,1,1)
   2. 最坏情况下的时间复杂度称为最坏时间复杂度。一般讨论的时间复杂度均是最坏情况下的时间复杂度，这样做的原因是：最坏情况下的时间复杂度是算法在任何输入实例上运行时间的界限，这就保证了算法的运行时间不会比最坏情况更长
   3. 平均时间复杂度和最坏时间复杂度是否一致和算法有关
 
-  ![](C:\WorkSpace\数据结构和算法\Data-structuresAndAlgorithms\img\排序\time.png)
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\time.png)
 
 
 
@@ -1648,7 +1648,543 @@ findWay(map,1,1)
   4. 归并排序
   5. 基数排序
 - **外部排序**
-=======
-  
->>>>>>> e0c7b9c7430297c4dfb356bf46a7c15cdd70a51e
 
+
+
+#### 冒泡排序（Bubble Sort）
+
+- **普通实现**
+
+  ```js
+  // 冒泡排序
+  /* 
+      order表示正反排序
+  */
+  function BubbleSort(arr,order){
+      // 数据校验
+      if(!(arr instanceof Array) && typeof(order !== 'number')return
+  
+      // 排序
+      let temp = 0
+      for(let i=0;i<arr.length -1;i++){
+          for(let j=0;j<arr.length -1 -i;j++){
+              if(arr[j] > arr[j+1]){
+                  temp = arr[j]
+                  arr[j] = arr[j+1]
+                  arr[j+1] = temp
+              }
+          }
+      }
+      if(order == 1){
+          return arr
+      }else if(order == -1){
+          return arr.reverse()
+      }
+  }
+  ```
+
+  
+
+- **冒泡排序的优化**
+
+  - 有些情况排序还没执行完毕时，数据的顺序已经排列好了，但是此时程序还会继续执行完毕，浪费了性能，因此可以判断排序是否提前完成，如果提前完成，就直接结束排序
+  - **实现思路**：添加一个标识，判断是否进入`if(arr[j] > arr[j+1])`，没进入说明有序
+
+  ```js
+  // 冒泡排序
+  /* 
+      order表示正反排序
+  */
+  function BubbleSort(arr, order) {
+    // 数据校验
+    if (!(arr instanceof Array) && typeof (order !== "number")) return;
+    // 排序
+    let temp = 0;
+    // 标志数据是否交换
+    let flag
+    for (let i = 0; i < arr.length - 1; i++) {
+       flag = false;
+      for (let j = 0; j < arr.length - 1 - i; j++) {
+        if (arr[j] > arr[j + 1]) {
+          flag = true;
+          temp = arr[j];
+          arr[j] = arr[j + 1];
+          arr[j + 1] = temp;
+        }
+      }
+    }
+    if (!flag) {
+      switch (order) {
+        case 1:
+          return arr;
+          break;
+        case -1:
+          return arr.reverse();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+  ```
+
+
+#### 选择排序（Selection Sort）
+
+- 选择排序也属于内部排序法，是从欲排序的数据中，按制定的规则选出某一元素，再依规定交换位置后达到排序的目的。
+
+- 选择排序一共会执行**数组长度-1**次排序
+
+- **排序思路**：
+
+  1. 先假设当前这个数是数组中最小的数
+  2. 然后和后面的数逐个比较，如果发现有比当前数更小的数，就重新确定最小数，并得到其下标
+  3. 当遍历到数组的最后时，就得到了本轮的最小数和下标
+  4. 将当前最小数和本轮得到的最小数进行交换
+
+- **代码实现**：
+
+  ```js
+  // 选择排序
+  function SesectionSort(arr){
+      // 数据校验
+      if(!(arr instanceof Array))return
+      // 记录最小值及其下标
+      let minValue = 0
+      let minIndex = 0
+      for(let i=0;i<arr.length;i++){
+          // 假设最小值
+          minValue = arr[i]
+          minIndex = i
+          for(let j=i+1;j<arr.length;j++){
+              if(minValue > arr[j]){
+                  // 说明假定的最小值有误,更新最小值及其下标
+                  minValue = arr[j]
+                  minIndex = j
+              }
+          }
+          // 判断是否进入最小值假定失败的情况
+          if(minIndex != i){
+              // 交换最小值
+              arr[minIndex] = arr[i]
+              arr[i] = minValue
+          }
+      }
+      return arr
+  }
+  
+  let arr1 = [3,5,8,1,9,10,6]
+  let arr2 = SesectionSort(arr1)
+  console.log(arr1);// [1,3,5,6,8,9,10]
+  ```
+
+
+
+
+#### 插入排序（Insertion Sort）
+
+- 对欲排序的元素以插入的方式来寻找该元素的适当位置，以达到排序的目的
+
+- **插入排序思路**：
+
+  1. 选择一个**待插入值**，**通常选择数组下标为1**的那个，以数组下标1为分界线，**左侧**看做为**有序排列**的，**右侧**看为**无序排列**的
+  2. 再选择**待插入下标**，为**待插入值的下标-1**
+  3. 进入循环，循环的判断条件为**待插入下标要大于等于0**且**待插入值小于待插入下标处的值**（从小到大排序），进入该循环说明待插入值还没有找到应该插入的位置（**因为待插入值还没有比其左侧的值大**），因此将**待插入下标所指的值移动到当前待插入值处**（待插入值此时被覆盖，但是已经事先用变量保存的了），**然后将待插入下标-1**（即左移）
+  4. 当跳出循环后，说明待插入值已经比左侧的值大了，那么此时已经找到了应该插入的位置，即**待插入下标+1**
+
+- **注意事项**：
+
+  1. **待插入值取数组下标为1**就是为了左边只保留一个，然后就可以把左边看为一个有序排列的，接下来比较时只需要比较有序排列的最后一个值即可
+  2. **待插入值**每轮循环都需要先用一个变量存起来，不然每次相邻项移动时会将待插入值**覆盖**
+  3. **待插入值**和**待插入下标**始终**相邻**，`arr[待插入下标 + 1] = 待插入值`
+
+- **代码实现**：
+
+  ```js
+  // 插入排序
+  // arr = [3,5,6,2,4]
+  function InsertionSort(arr){
+      if(!(arr instanceof Array)return
+      for(let i = 1;i<arr.length;i++){
+          // 待插入值
+          let insertionVal = arr[i]
+          // 待插入位置
+          let insertionIndex = i-1
+          // insertionVal < arr[insertionIndex]时说明还没找到插入的位置，需要将arr[insertionIndex]后移（从小到大排序）
+          while(insertionIndex>=0 && insertionVal < arr[insertionIndex]){
+              arr[insertionIndex+1] = arr[insertionIndex]
+              insertionIndex--
+          }
+          // 退出循环时说明插入的位置已找到
+          arr[insertionIndex + 1] = insertionVal
+      }
+      return arr
+  }
+  
+  let arr1 = [3,5,6,2,4]
+  let arr2 = InsertionSort(arr1)
+  console.log(arr2);// [2,3,4,5,6]
+  ```
+
+
+
+
+#### 希尔排序（Shell Sort）
+
+- **希尔排序介绍**
+
+  - 希尔排序也是一种插入排序，他是简单插入排序经过改进之后的一个更高效的版本，也称为**缩小增量排序**
+
+- **希尔排序基本思想**
+
+  - 希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰好被分成一组，算法便终止
+
+- **希尔排序的优势**
+
+  - 根据步长将数组分组进行比较，可较快的将较小的数交换至前面，避免插入排序时，较小的数在后面时，需要挨个移动
+  - **但是，希尔排序插入时采用交换法时，效率极低，导致效率甚至不如基本的插入排序，但是插入时采用优化时效率就大大提高**
+
+  <img src="C:\Users\Administrator\Desktop\数据结构和算法\img\排序\ShellSort.png" style="zoom: 80%;" />
+
+- **希尔排序插入时交换法代码实现**
+
+- **注意事项**
+
+  1. 数组分组时步长gap必须是一个整数，且**不考虑四舍五入**，通通**向下取整**
+
+  2. i 的值控制了每次比较都是将每一组都比较一次，如此往复，并**不是将某一组一次性比较完**
+  3. **i 从 gap 往上增长的过程中，每一组前面的数据只是相邻项进行了大小比较，但是比较后值交换后的顺序是不得而知的，因此每一组比较时j的值应该不断-gap往前挪再将前面的进行比较才能保证顺序**
+
+  ```js
+  // 希尔排序在插入时--交换法实现
+  function shellSort(arr) {
+    if (!(arr instanceof Array) return;
+    let count = 0;
+    for (let gap = parseInt(arr.length / 2); gap > 0; gap = parseInt(gap / 2)) {
+      let temp = 0; // 用于交换
+      for (let i = gap; i < arr.length; i++) {
+          // i的值控制了每次比较都是将每一组都比较一次，如此往复，并不是将某一组一次性比较完
+        for (let j = i - gap; j >= 0; j -= gap) {
+          // i从gap往上增长的过程中，每一组前面的数据只是相邻项进行了大小比较，但是比较后值交换后的顺序是不得而知的，因此每一组比较时j的值应该不断-gap往前挪再将前面的进行比较才能保证顺序
+          if (arr[j] > arr[j + gap]) {
+            temp = arr[j];
+            arr[j] = arr[j + gap];
+            arr[j + gap] = temp;
+          }
+        }
+      }
+      count++;
+      console.log("希尔排序插入时交换法第" + count + "轮：", arr);
+    }
+  }
+  
+  let arr = [8,9,1,7,2,3,5,4,6,0];
+  shellSort(arr);
+  
+  ```
+
+
+
+- **希尔排序插入时移位法代码实现**
+
+  - 插入时采用交换法时，交换操作执行太多次，从而导致效率极低
+  - 因此插入时采用**移位法**进行优化
+
+  ```js
+  // 希尔排序在插入时--移位法实现
+  function shellSortOfShift() {
+    if (!(arr instanceof Array) return;
+    for (let gap = parseInt(arr.length / 2); gap > 0; gap = parseInt(gap / 2)) {
+      for (let i = gap; i < arr.length; i++) {
+        let j = i;
+        let temp = arr[j]; // 临时变量存储待插入值
+        if (arr[j] < arr[j - gap]) {
+          // 移位找待插入位置
+          while (j - gap >= 0 && temp < arr[j - gap]) {
+            // 移位
+            arr[j] = arr[j - gap];
+            j -= gap;
+          }
+          // 当退出while循环时，说明找到了temp应该插入的位置,插入即可
+          arr[j] = temp;
+        }
+      }
+    }
+    console.log(arr);
+  }
+  
+  let arr = [8, 9, 1, 7, 2, 3, 5, 4, 6, 0];
+  shellSortOfShift(arr);
+  ```
+
+- **移位法不也是每次移位都要进行赋值操作吗，为什么效率就比交换法高呢？**
+
+  - 插入采用移位法时，待插入值左侧的数据会一直保持一个有序的数列，因此移位操作进行的次数并没有想象的那么大，但是交换法时，每一组的交换都会从后往前逐个比较后然后进行交换才能保证一直有序，当数据的量级较大时，那么每一组的交换次数就会大大的提升，极大的影响的效率
+
+  
+
+#### 快速排序（Quick Sort）
+
+- 快速排序是对冒牌排序的一种改进。
+
+- **基本思想**：通过一次排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列
+
+- 中间这个**基准值**可以根据自己喜好选取
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\QuickSort.png)
+
+- **快速排序理解难点**：
+
+  1. **在左右两侧找数值和中值进行比较交换后，需要判断交换后的值是否和中值相等，因为如果相等的话，此时`arr[l] < pivot`的条件肯定不满足，也就是说此时 l 的值不会再变化，那么当右侧再找到一个合法值进行交换时，就又会将刚换过来的arr[ l ]给换到右侧去，等于之前的交换白干，且一直陷入这个死循环**。右侧同理。因此我们需要对交换后的值进行一个校验，**交换后如果`arr[l] == pivot`，那么此时我们应该将右侧的索引`r--`**，**交换后如果`arr[r] == pivot`，那么此时我们应该将左侧的索引`l++`**。这样就可以避免因为交换后的值和中值pivot相等而导致索引不再变化的窘境
+
+- **代码实现**
+
+  ```js
+  // 快速排序
+  function QuickSort(arr, left, right) {
+    if (!(arr instanceof Array)) return;
+    let l = left; // 左下标
+    let r = right; // 右下标
+    let pivot = parseInt(arr[(l+r)/2]); // 中轴值
+    let temp = 0;
+    while (l < r) {
+      // 在pivot中值左边一直找，直到找到值大于等于pivot才退出
+      while (arr[l] < pivot) {
+        l++;
+      }
+      // 在pivot右边一直找，直到找到值小于等于pivot才退出
+      while (arr[r] > pivot) {
+        r--;
+      }
+      // 当l>r时，说明左侧都比中值小，右侧都比中值大了(递归的出口)
+      if (l >= r) {
+        break;
+      }
+      // 交换
+      temp = arr[l];
+      arr[l] = arr[r];
+      arr[r] = temp;
+  
+      // 交换完后还需要进行校验,若交换完后arr[l] == pivot,
+      //那么此时应该把右侧r的值向左移动一下，
+      //不然下一轮循环时，arr[l]<pivot这个条件始终不满足，那么l将不在移动，
+      //此时如果右侧再找到一个合法值，那么再次交换就会把arr[l]再次移动到右侧，等于做了无用功
+      if (arr[l] == pivot) {
+        r--;
+      }
+      if (arr[r] == pivot) {
+        l++;
+      }
+    }
+    // 经过上述操作，此时已经根据中值pivot将值进行分割，
+    //左侧均小于pivot,右侧均大于pivot,但两侧都不保证有序！还要对左右两侧进行递归排序
+    if (l == r) {
+      l++;
+      r--;
+    }
+    // 左递归
+    if (left < r) {
+      QuickSort(arr, left, r);
+    }
+    // 右递归
+    if (l < right) {
+      QuickSort(arr, l, right);
+    }
+    return arr;
+  }
+  
+  let arr = [
+    2, 4, 6, 3, 2, 31, 5, 15, 3, -35, -54, 32, 2352, 65, -2334, 324, 2342,
+  ];
+  let res = QuickSort(arr, 0, arr.length - 1);
+  console.log(res);
+  
+  ```
+
+
+
+
+#### 归并排序（Merge Sort）
+
+- 归并排序是利用归并的思想实现的排序方法，该算法采用经典的**分治（divide-and-conquer）策略**。（分治法将问题**分**（**divide**）成一些小的问题然后递归求解，而**治**（**conquer**）的阶段则将分的阶段得到的各答案“修补”在一起，即**分而治之**）
+- 归并排序的**时间复杂度**是**线性**的，合并的次数是`数组长度-1`
+
+- **基本思想** 
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\MergeSortThink.png)
+
+- **合并流程**
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\MergeSort.png)
+
+- **理解难点**：
+
+  1. **右侧的起始值为什么是`mid+1`?** 
+     - 这是因为我们将左侧的值的范围定的是`left 到 mid`，那么右侧起始值自然就是`mid+1`
+  2. **合并时为什么多一个记录中间索引的变量mid?**
+     - 因为区分左右两侧数据需要中间索引
+  3. **每次合并后temp中的数据已经是有序的了，为什么还要将其再次赋值给arr？**
+     - 因为我们是利用递归来实现的排序，且我们的操作最终都是要落实到 arr 上的，这样最后的结果才能在 arr 上得到体现
+
+- **代码实现**：
+
+  ```js
+  ![RadixSort](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\RadixSort.png)![RadixSort](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\RadixSort.png)// 归并排序
+  
+  /**
+   *
+   * @param {Array} arr 待排序数组
+   * @param {Number} left 左侧开始索引
+   * @param {Number} mid 中间索引
+   * @param {Number} right 右侧结束索引
+   * @param {Array} temp 中转数组
+   */
+  function merge(arr, left, mid, right, temp) {
+    let i = left; // 记录左侧起始索引
+    let j = mid + 1; // 记录右侧起始索引
+    let t = 0; // 记录中转数组起始下标
+    while (i <= mid && j <= right) {
+      // 将左右两侧值进行比较将较小的值放入临时数组（从小到大排序）
+      if (arr[i] <= arr[j]) {
+        temp[t] = arr[i];
+        t++;
+        i++;
+      } else {
+        temp[t] = arr[j];
+        t++;
+        j++;
+      }
+    }
+    // 出了上面循环后，说明左右两侧肯定有一侧的数据已经比较完了
+    // 此时需要将剩余的那一侧的数据依次放入临时数组
+    while (i <= mid) {
+      temp[t] = arr[i];
+      t++;
+      i++;
+    }
+    while (j <= right) {
+      temp[t] = arr[j];
+      t++;
+      j++;
+    }
+  
+    // 经过上述操作，此时temp已经是有序的了，此时将temp的值拷贝到arr
+    t = 0;
+    let tempLeft = left;
+    while (tempLeft <= right) {
+      arr[tempLeft] = temp[t];
+      tempLeft++;
+      t++;
+    }
+  }
+  
+  /**
+   *
+   * @param {Array} arr
+   * @param {Number} left
+   * @param {Number} right
+   * @param {Array} temp
+   */
+  function mergeSort(arr, left, right, temp) {
+    if(left < right){
+      let mid = parseInt((left + right) / 2);
+      // 向左递归分解
+      mergeSort(arr,left,mid,temp)
+      // 向右递归分解
+      mergeSort(arr,mid+1,right,temp)
+      // 合并
+      merge(arr,left,mid,right,temp)
+    }
+    return arr
+  }
+  
+  let arr = [2,-32,34,223,6,8,9,3,34,24,343,81,45]
+  let temp = []
+  let res = mergeSort(arr,0,arr.length-1,temp)
+  console.log(res);// [ -32,  2,  3,  6,  8, 9, 24, 34, 34, 45, 81, 223, 343]
+  
+  ```
+
+
+
+#### 基数排序（Radix Sort）
+
+- **基数排序（桶排序介绍）**
+
+  1. 基数排序属于 “分配式排序”（distribution sort），又称 “桶子法”（bucket sort）或 bin sort，顾名思义，它是通过键值的各个位的值，将要排序的元素分配至某些 “桶”中，达到排序的作用
+  2. 基数排序法是属于稳定性的排序，是效率高的稳定性排序法
+  3. 基数排序是 “桶排序”的扩展
+  4. 基数排序是1887年赫尔曼-何乐礼发明的。它是这样实现的：将整数按位数切割成不同的数字，然后按每个位数分别比较
+
+- **基本思想**
+
+  - 将所有待比较数值统一为同样的数位长度，数位较短的数前面补零。然后，从最低位开始，依次进行一次排序。这样从最低位排序一直到最高位排序完成以后，数列就变成一个有序序列
+  - 执行轮数取决于数组中最大数的位数
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\RadixSort.png)
+
+- **基数排序注意事项**
+
+  1. 不能处理负数
+  2. 每轮从桶中取出数据后将桶中的数据置空
+  3. 每轮结束后将记录每个桶中数据个数的数组进行初始化
+  4. 基数排序也是典型的**空间换时间**的算法
+
+- **代码实现**
+
+  ```js
+  // 基数排序
+  function radixSort(arr) {
+    if (!(arr instanceof Array)) return;
+    let buckets = []; // 存储所有桶
+    // 添加十个桶
+    for (let i = 0; i < 10; i++) {
+      buckets[i] = [];
+    }
+    // 定义一个一维数组存放每个桶内部存储的数据的个数
+    let bucketSaveCounts = [];
+    // 初始化一维数组
+    for (let i = 0; i < 10; i++) {
+      bucketSaveCounts[i] = 0;
+    }
+  
+    // 获得数组中最大值的位数（因为排序的次数取决于数组中最大值的位数-1）
+    let maxValLen = (Math.max(...arr) + "").length;
+    let index = 0;
+    for (let count = 0; count < maxValLen; count++) {
+      // 针对每个元素的个位进行排序处理
+      for (let i = 0; i < arr.length; i++) {
+        // 记录当前位数   个位 十位 ..
+        let unitsDigit = parseInt(arr[i] / Math.pow(10, count)) % 10;
+        // 根据位数，将值放入对应的backet中(注意这里不能用i bucket[unitsDigit][i])
+        buckets[unitsDigit][bucketSaveCounts[unitsDigit]] = arr[i];
+        // 更新bucketSaveCounts中对应桶存储的数量
+        bucketSaveCounts[unitsDigit]++;
+      }
+      // 桶中元素已经放好，需要将其取出重新放入arr
+      index = 0;
+      for (let i = 0; i < buckets.length; i++) {
+        for (let j = 0; j < bucketSaveCounts[i]; j++) {
+          if (buckets[i].length !== 0) arr[index++] = buckets[i][j];
+        }
+        // 该桶元素放好后将其置空
+        buckets[i] = []
+      }
+      // 每一轮结束需要将bucketSaveCounts统计的数量置0
+      for (let i = 0; i < 10; i++) {
+        bucketSaveCounts[i] = 0;
+      }
+    }
+    return arr;
+  }
+  
+  let arr1 = [3, 324, 542, 123, 53, 64, 87, 33, 21, 13, 245,132];
+  let res = radixSort(arr1);
+  console.log(res);// [ 3, 13, 21, 33, 53, 64, 87, 123, 132, 245, 324, 542]
+  ```
+
+
+
+### 排序算法的时间复杂度总结
+
+![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\sortSummary.png)
