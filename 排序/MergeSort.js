@@ -39,7 +39,7 @@ function merge(arr, left, mid, right, temp) {
 
   // 经过上述操作，此时temp已经是有序的了，此时将temp的值拷贝到arr
   t = 0;
-  let tempLeft = left;
+  let tempLeft = left;// 左侧起始索引不能变，因此用一个临时变量代替遍历
   while (tempLeft <= right) {
     arr[tempLeft] = temp[t];
     tempLeft++;
@@ -67,8 +67,9 @@ function mergeSort(arr, left, right, temp) {
   return arr
 }
 
-let arr = [2,-32,34,223,6,8,9,3,34,24,343,81,45]
+let arr = [8,4,5,7,1,3,6,2]
 let temp = []
 let res = mergeSort(arr,0,arr.length-1,temp)
 console.log(res);
 
+ 

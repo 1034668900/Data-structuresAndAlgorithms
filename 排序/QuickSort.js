@@ -3,7 +3,7 @@ function quickSort(arr, left, right) {
   if (!(arr instanceof Array)) return;
   let l = left; // 左下标
   let r = right; // 右下标
-  let pivot = parseInt(arr[(l+r)/2]); // 中轴值
+  let pivot = arr[parseInt((l+r)/2)]; // 中轴值
   let temp = 0;
   while (l < r) {
     // 在pivot中值左边一直找，直到找到值大于等于pivot才退出
@@ -56,3 +56,5 @@ let arr = [
 ];
 let res = quickSort(arr, 0, arr.length - 1);
 console.log(res);
+
+

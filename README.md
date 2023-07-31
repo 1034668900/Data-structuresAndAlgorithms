@@ -1639,6 +1639,7 @@ findWay(map,1,1)
   1. 插入排序
      1. 直接插入排序
      2. 希尔排序
+        - 插入时有**交换法**和**移位法**之分，移位法效率更高
   2. 选择排序
      1. 简单选择排序
      2. 堆排序
@@ -1695,15 +1696,15 @@ findWay(map,1,1)
   /* 
       order表示正反排序
   */
-  function BubbleSort(arr, order) {
+  function bubbleSort(arr, order) {
     // 数据校验
     if (!(arr instanceof Array) && typeof (order !== "number")) return;
     // 排序
     let temp = 0;
-    // 标志数据是否交换
-    let flag
+    let flag = true;
     for (let i = 0; i < arr.length - 1; i++) {
-       flag = false;
+      if (!flag) break;// 判断上一次有没有进入arr[j] > arr[j+1]
+      flag = false;
       for (let j = 0; j < arr.length - 1 - i; j++) {
         if (arr[j] > arr[j + 1]) {
           flag = true;
@@ -1713,17 +1714,14 @@ findWay(map,1,1)
         }
       }
     }
-    if (!flag) {
-      switch (order) {
-        case 1:
-          return arr;
-          break;
-        case -1:
-          return arr.reverse();
-          break;
-        default:
-          break;
-      }
+  
+    switch (order) {
+      case 1:
+        return arr;
+      case -1:
+        return arr.reverse();
+      default:
+        break;
     }
   }
   ```
@@ -1898,6 +1896,7 @@ findWay(map,1,1)
       for (let i = gap; i < arr.length; i++) {
         let j = i;
         let temp = arr[j]; // 临时变量存储待插入值
+          // 只有当arr[j]<arr[j-gap]时我们才需要移位找插入位置，因为希尔排序左侧是一个有序序列
         if (arr[j] < arr[j - gap]) {
           // 移位找待插入位置
           while (j - gap >= 0 && temp < arr[j - gap]) {
@@ -1919,7 +1918,7 @@ findWay(map,1,1)
 
 - **移位法不也是每次移位都要进行赋值操作吗，为什么效率就比交换法高呢？**
 
-  - 插入采用移位法时，待插入值左侧的数据会一直保持一个有序的数列，因此移位操作进行的次数并没有想象的那么大，但是交换法时，每一组的交换都会从后往前逐个比较后然后进行交换才能保证一直有序，当数据的量级较大时，那么每一组的交换次数就会大大的提升，极大的影响的效率
+  - 插入采用**移位法**时，待插入值左侧的数据会一直保持一个**有序数列**，因此移位操作进行的次数并没有想象的那么大，但是**交换法时**，**每一组的交换都会从后往前逐个比较后然后进行交换才能保证一直有序**，当数据的量级较大时，那么每一组的交换次数就会大大的提升，极大的影响的效率
 
   
 
@@ -1927,7 +1926,7 @@ findWay(map,1,1)
 
 - 快速排序是对冒牌排序的一种改进。
 
-- **基本思想**：通过一次排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列
+- **基本思想**：通过一次排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以**递归**进行，以此达到整个数据变成有序序列
 
 - 中间这个**基准值**可以根据自己喜好选取
 
@@ -1935,7 +1934,8 @@ findWay(map,1,1)
 
 - **快速排序理解难点**：
 
-  1. **在左右两侧找数值和中值进行比较交换后，需要判断交换后的值是否和中值相等，因为如果相等的话，此时`arr[l] < pivot`的条件肯定不满足，也就是说此时 l 的值不会再变化，那么当右侧再找到一个合法值进行交换时，就又会将刚换过来的arr[ l ]给换到右侧去，等于之前的交换白干，且一直陷入这个死循环**。右侧同理。因此我们需要对交换后的值进行一个校验，**交换后如果`arr[l] == pivot`，那么此时我们应该将右侧的索引`r--`**，**交换后如果`arr[r] == pivot`，那么此时我们应该将左侧的索引`l++`**。这样就可以避免因为交换后的值和中值pivot相等而导致索引不再变化的窘境
+  1. **在左右两侧找数值和中值进行比较交换后，需要判断交换后的值是否和中值相等，因为如果相等的话，此时`arr[l] < pivot`的条件肯定不满足，也就是说此时 l 的值不会再变化，右侧同理。l  和 r 如果不再变化，那么 `l >= r`这个条件将不可能完成，那么就会变成死龟**。因此我们需要对交换后的值进行一个校验，**交换后如果`arr[l] == pivot`，那么此时我们应该将右侧的索引`r--`**，**交换后如果`arr[r] == pivot`，那么此时我们应该将左侧的索引`l++`**。这样就可以避免因为交换后的值和中值pivot相等而导致索引不再变化的窘境
+  2. 要对`l == r`的情况进行处理，此时需要将`l++ r--`,即需要将其错开，避免左右递归时，`l == r`会导致左右序列有重合
 
 - **代码实现**
 
@@ -1945,7 +1945,7 @@ findWay(map,1,1)
     if (!(arr instanceof Array)) return;
     let l = left; // 左下标
     let r = right; // 右下标
-    let pivot = parseInt(arr[(l+r)/2]); // 中轴值
+    let pivot = arr[parseInt((l+r)/2）]; // 中轴值
     let temp = 0;
     while (l < r) {
       // 在pivot中值左边一直找，直到找到值大于等于pivot才退出
@@ -1967,8 +1967,8 @@ findWay(map,1,1)
   
       // 交换完后还需要进行校验,若交换完后arr[l] == pivot,
       //那么此时应该把右侧r的值向左移动一下，
-      //不然下一轮循环时，arr[l]<pivot这个条件始终不满足，那么l将不在移动，
-      //此时如果右侧再找到一个合法值，那么再次交换就会把arr[l]再次移动到右侧，等于做了无用功
+      //不然下一轮循环时，arr[l]<pivot这个条件始终不满足，那么l将不在移动，右侧同理
+      //（l和r不移动将导致 l>=r 不可能满足，从而导致死龟）
       if (arr[l] == pivot) {
         r--;
       }
@@ -2007,9 +2007,12 @@ findWay(map,1,1)
 #### 归并排序（Merge Sort）
 
 - 归并排序是利用归并的思想实现的排序方法，该算法采用经典的**分治（divide-and-conquer）策略**。（分治法将问题**分**（**divide**）成一些小的问题然后递归求解，而**治**（**conquer**）的阶段则将分的阶段得到的各答案“修补”在一起，即**分而治之**）
+
 - 归并排序的**时间复杂度**是**线性**的，合并的次数是`数组长度-1`
 
 - **基本思想** 
+
+  - **序号为递归执行顺序**
 
   ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\MergeSortThink.png)
 
@@ -2029,7 +2032,7 @@ findWay(map,1,1)
 - **代码实现**：
 
   ```js
-  ![RadixSort](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\RadixSort.png)![RadixSort](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\RadixSort.png)// 归并排序
+  // 归并排序
   
   /**
    *
@@ -2070,7 +2073,7 @@ findWay(map,1,1)
   
     // 经过上述操作，此时temp已经是有序的了，此时将temp的值拷贝到arr
     t = 0;
-    let tempLeft = left;
+    let tempLeft = left;// 左侧起始索引不能变，因此用一个临时变量代替遍历
     while (tempLeft <= right) {
       arr[tempLeft] = temp[t];
       tempLeft++;
@@ -2185,6 +2188,11 @@ findWay(map,1,1)
 
 
 
-### 排序算法的时间复杂度总结
+#### 排序算法的时间复杂度总结
 
 ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\sortSummary.png)
+
+
+
+### 查找算法
+
