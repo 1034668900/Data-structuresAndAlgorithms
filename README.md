@@ -940,19 +940,19 @@
 
 ## 栈(stack)
 
-#### 栈的定义
+### 栈的定义
 
 1. 栈是一个**后入先出**的有序列表
 2. 栈(stack)是**限制线性表中元素的插入和删除只能在一端**的数据结构，这一端在**变化**，可插入和删除，叫做**栈顶**，另一端叫**栈底**
 
-#### 数组模拟栈的思路
+### 数组模拟栈的思路
 
 1. 初始化一个数组(stack)，定义一个**top**指针，初始时为**-1**
 2. **入栈**（push）时，先将`top++`,然后赋值`stack[i] = data`
 3. **出栈**（pop）时，由于需要**返回出栈的数据**，因此**先**创建一个临时变量存储栈顶的数据`temp = stack[top]`,**然后**`top--`，**最后**`return temp`即可
 4. 栈的**遍历**，遍历时，注意数据是从**栈顶开始遍历**
 
-#### 数组模拟栈的代码实现
+### 数组模拟栈的代码实现
 
 ```js
 // 数组模拟栈
@@ -1027,7 +1027,7 @@ stack.list();
 
 
 
-#### 使用栈完成中缀表达式计算器功能
+### 使用栈完成中缀表达式计算器功能
 
 - **情景描述**：接收一个形如:`2*5*3+2-1`的**表达式**，计算其结果
 
@@ -1242,7 +1242,7 @@ stack.list();
 
 
 
-#### 前缀表达式（波兰表达式）
+### 前缀表达式（波兰表达式）
 
 - **前缀表达式的计算机求值**：**从右至左**扫描表达式，当**遇到数字时**，将数字压入堆栈，**遇到运算符时**，弹出栈顶的两个数，用运算符对它们做相应的计算（栈顶元素和次顶元素），并**将结果入栈**；**重复上述过程**直到表达式**最左端**，最后运算得出的值即为表达式的结果。`eg: (3 + 4) * 5 - 6`对应的**前缀表达式**为：`- * + 3 4 5 6`
 - **为什么要使用前缀表达式或者后缀表达式**？中缀表达式对我们人来说确实很好理解和使用，但是对计算机来说并不容易操作，因此在计算时我们往往会将中缀表达式转换为其他表达式来进行运算（一般转为**后缀表达式**）
@@ -1253,7 +1253,7 @@ stack.list();
   3. 最后把括号都去掉
   4. **例如**：`(3+4)*5-6  `    加括号：`(((3+4)*5)-6) `  移符号：`  -(*(+(3 4)5)6) `   去括号：`- * + 3 4 5 6`
 
-#### 后缀表达式（逆波兰表达式）
+### 后缀表达式（逆波兰表达式）
 
 - 与前缀表达式相似，只是运算符位于操作数**之后**`eg: (3 + 4) * 5 - 6`对应的**后缀表达式**为：`3 4 + 5 * 6 -`
 
@@ -1293,9 +1293,9 @@ stack.list();
 
   
 
-#### 中缀表达式转后缀表达式
+### 中缀表达式转后缀表达式
 
-- **中缀表达式如何转换为后缀表达式**？
+- **中缀表达式如何转换为后缀表达式**
 
   1. 按照运算符的**优先级**，对**所有**的运算单位加括号（注意**每个**运算符都要有）
   2. 从**最里面**的运算符**开始**，依次把运算符号移动到对应的括号**后面**
@@ -2473,5 +2473,177 @@ findWay(map,1,1)
 
 - 哈希表，又叫散列表，是根据关键码值（key value）而直接进行访问的**数据结构**。也就是说，它通过把关键码值映射到表中一个位置来访问记录，以加快查找的速度。这个映射函数叫做**散列函数**，存放记录的**数组**叫做哈希表（散列表）。
 
+### 实现思路
 
+- 所谓哈希表，可将其拆解为三个类，其分别是
+  1. Emplayee  这代表链表上的一个**节点**  （以 雇员类 为例）
+  2. EmplayeeLinkList  这代表由一个个**节点组成的链表**  （以 雇员链表类 为例）
+     - 内部维护对**节点**的**增删改查**
+  3. hashTable  这代表**存储一条条链表的哈希表**  
+     - hashTable内会维护一个**散列函数**，它接收一个**节点**的参数（以 id 为例），根据这个参数进行一定的规则运算，得到一个**该节点在哈希表中应该在哪一条链上的位置**
+     - 调用链表原本的方法**重写增删改查**
 
+- **代码实现**
+
+  ```js
+  // 哈希表
+  
+  // 雇员类
+  class Emplayee {
+    id = "";
+    name = "";
+    // 指向下一个节点
+    next = null;
+  
+    constructor(id, name) {
+      this.id = id;
+      this.name = name;
+    }
+  }
+  
+  // 雇员链表类
+  class EmplayeeLinkList {
+    #head = null; // 头指针，执行第一个Emplayee，因此这个链表的head，是直接指向第一个Emplayee的
+  
+    // 添加雇员到链表
+    /* 1.假定当添加雇员时，id是自增长的，即id的分配从小到大，因此我们直接将该雇员加入到本链表的最后
+     */
+    add(emplayee) {
+      // 如果是第一个雇员
+      if (this.#head == null) {
+        this.#head = emplayee;
+        return;
+      }
+      // 如果不是第一个雇员
+      let emplayeePointer = this.#head;
+      while (true) {
+        if (emplayeePointer.next == null) {
+          break;
+        }
+        emplayeePointer = emplayeePointer.next;
+      }
+      // 退出循环时就已经指向了链表的最后一个数据
+      emplayeePointer.next = emplayee;
+    }
+  
+    // 遍历雇员信息
+    list(index) {
+      if (this.#head == null) {
+        console.log(index + "号链表为空，无法遍历");
+        return;
+      }
+      let emplayeePointer = this.#head; // 辅助指针，用于遍历
+      console.log(index + "号链表的信息为：");
+      while (true) {
+        console.log(`id=${emplayeePointer.id}|name=${emplayeePointer.name}`);
+        if (emplayeePointer.next == null) break;
+        emplayeePointer = emplayeePointer.next;
+      }
+    }
+    // 根据id查找雇员
+    find(id) {
+      let headPointer = this.#head;
+      while (true) {
+        if (headPointer.id == id) {
+          console.log("找到了" + headPointer.name);
+          return;
+        }
+        if (headPointer.next == null) break;
+        headPointer = headPointer.next;
+      }
+      console.log("查无此人");
+    }
+    // 根据id删除雇员
+    remove(id) {
+      // 获取到该id应该在哪一条链表上
+      let headPointer = this.#head;
+      while (true) {
+        if (headPointer.next.id == id) {
+          let temp = headPointer.next;
+          if (headPointer.next.next != null) {
+            headPointer.next = headPointer.next.next;
+          } else {
+            headPointer.next = null;
+          }
+          console.log("成功删除" + temp.name);
+          return;
+        }
+        if (headPointer.next == null) break;
+        headPointer = headPointer.next;
+      }
+      // 如果执行到这里，说明找完了也没找到
+      console.log("查无此人");
+    }
+    // 获得头节点
+    getHead() {
+      return this.#head;
+    }
+  }
+  
+  // 哈希表，用于管理多条链表
+  class HashTable {
+    #EmplayeeLinkListArray = []; // 存储多条链表
+    #size = 0; // 表示有多少条链表
+  
+    constructor(size) {
+      this.#size = size;
+      // 初始化EmplayeeLinkListArray
+      for (let i = 0; i < size; i++) {
+        this.#EmplayeeLinkListArray[i] = new EmplayeeLinkList();
+      }
+    }
+  
+    // 添加雇员
+    add(emplayee) {
+      // 根据员工的id，得到该员工应该添加到哪条链表
+      let emplayeePosition = this.hashFun(emplayee.id);
+      // 将emplayeePosition添加到对应的链表中
+      this.#EmplayeeLinkListArray[emplayeePosition].add(emplayee);
+    }
+    // 遍历哈希表
+    list() {
+      for (let i = 0; i < this.#size; i++) {
+        this.#EmplayeeLinkListArray[i].list(i);
+      }
+    }
+    // 根据id查找雇员
+    find(id) {
+      // 获取到该id应该在哪一条链表上
+      let emplayeePosition = this.hashFun(id);
+      this.#EmplayeeLinkListArray[emplayeePosition].find(id);
+  
+    }
+    // 根据id移除雇员
+    remove(id) {
+      // 获取到该id应该在哪一条链表上
+      let emplayeePosition = this.hashFun(id);
+      this.#EmplayeeLinkListArray[emplayeePosition].remove(id);
+    }
+    // 散列函数（有多种写法，这是最简单的一种，根据id为其分配链表）
+    hashFun(id) {
+      return id % this.#size;
+    }
+  }
+  
+  const hashTable = new HashTable(5);
+  const emplayeeLinkList = new EmplayeeLinkList();
+  const emplayee1 = new Emplayee(1, "fc");
+  const emplayee2 = new Emplayee(2, "ly");
+  const emplayee3 = new Emplayee(3, "fy");
+  const emplayee4 = new Emplayee(6, "lyBB");
+  const emplayee5 = new Emplayee(11, "fyBB");
+  const emplayee6 = new Emplayee(16, "fcBB");
+  
+  hashTable.add(emplayee1);
+  hashTable.add(emplayee2);
+  hashTable.add(emplayee3);
+  hashTable.add(emplayee4);
+  hashTable.add(emplayee5);
+  hashTable.add(emplayee6);
+  //hashTable.list();
+  hashTable.find(16);
+  //hashTable.remove(11);
+  
+  ```
+
+  
