@@ -2188,6 +2188,94 @@ findWay(map,1,1)
 
 
 
+### 堆排序（Heap Sort）
+
+- **基本介绍**
+
+  1. 堆排序是利用**堆**这种数据结构而设计的一种排序算法，堆排序是一种**选择排序**，它的最坏，最好，平均时间复杂度均为O(nlogn)，它也是**不稳定排序**
+  2. 堆是具有以下性质的**完全二叉树**：**每个节点的值都大于或等于其左右子节点的值**，称为**大顶堆**，**注意**：**没有要求节点的左子节点的值和右子节点的值的大小关系**
+  3. **每个节点的值都小于或等于其左右子节点的值**，称为**小顶堆**
+
+  ![大顶堆](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\pileSort.png)
+
+  ![小顶堆](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\pileSortMin.png)
+
+- **堆排序的基本思想**
+  1. 将待排序序列构造成一个大顶堆（以数组形式存储）
+  2. 此时，整个序列的最大值就是堆顶的根节点
+  3. 将其与末尾元素进行交换，此时末尾就为最大值
+  4. 然后将剩余 n - 1 个元素重新构造成一个堆，这样会得到 n 个元素的次小值。如此反复执行，便能得到一个有序序列了
+
+- **代码实现**
+
+  - 将一个数组以索引为i的非叶子节点为根节点的子树调整成大顶堆或小顶堆
+
+    ```js
+     // HeapSort类
+      /**
+       * 将一个数组以索引为i的非叶子节点为根节点的子树调整成大顶堆或小顶堆
+       * @param {Array} arr 待调整的数组
+       * @param {Number} i 表示非叶子节点在数组中的索引
+       * @param {Number} length 表示对多少个元素进行调整，length是在逐渐减少的
+       */
+      adjustHeap(arr, i, length) {
+        // 存储当前元素的值
+        let temp = arr[i];
+        // 开始调整
+        for (let k = i * 2 + 1; k < length; k = k * 2 + 1) {
+          // arr[k] < arr[k+1]表示左子节点的值小于右子节点的值
+          if (k + 1 < length && arr[k] < arr[k + 1]) {
+            k++; // 这种情况使k指向右子节点
+          }
+          // 到这里后，k指向的一定是左、右子节点中较大的一个
+          if (arr[k] > temp) {
+            // 如果子节点大于了父节点，就将其赋值给当前节点（大顶堆）
+            arr[i] = arr[k];
+            // 更新i的索引，循环比较
+            i = k;
+          } else {
+            // 这里说明arr[k]<= temp,则arr[i]的值就是三者（当前非叶子节点及其左、右子节点）中最大的，不做改变
+            break;
+          }
+        }
+        // 当推出for循环后，已经将以i为父节点的树的最大值放在了当前子树的最顶部（局部的）
+        // 再将顶部的值交换到被调换的位置（这里的i已经不是非叶子节点的索引，已经是被调换的节点的索引了）
+        arr[i] = temp;
+      }
+    ```
+
+  - **完成堆排序**
+
+    -  `i = parseInt(arr.length / 2) - 1`是获取索引最大的非叶子节点非叶子节点
+
+    ```js
+    // HeapSort类
+    // 堆排序的方法
+      heapSort(arr) {
+        let temp = 0
+        // 将数组整体转换为大顶堆或小顶堆
+        for (let i = parseInt(arr.length / 2) - 1; i >= 0; i--) {
+            this.adjustHeap(arr,i,arr.length)
+        }
+    
+        // 将堆顶元素与末尾元素交换（大顶堆）
+        // 重新调整结构，使其满足堆定义，然后继续交换堆顶元素与当前末尾元素
+        // 反复执行调整+交换步骤，直到整个序列有序
+        for(let j = arr.length -1;j>0;j--){
+            // 交换
+            temp = arr[j]
+            // 每次经过adjustHeap的调整，最大的值都会在索引为0的地方
+            arr[j] = arr[0]
+            arr[0] = temp
+            // 每次调整的长度都会逐渐减少（最大的已经确定，不用再管）
+            this.adjustHeap(arr,0,j)
+        }
+        return arr
+      }
+    ```
+
+    
+
 ### 排序算法的时间复杂度总结
 
 ![](C:\Users\Administrator\Desktop\数据结构和算法\img\排序\sortSummary.png)
@@ -2644,6 +2732,815 @@ findWay(map,1,1)
   hashTable.find(16);
   //hashTable.remove(11);
   
+  ```
+
+
+
+
+## 树
+
+### 树的常用术语
+
+- **图示**
+
+<img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\tree.png" style="zoom: 50%;" />
+
+- **术语介绍**
+  1. 节点
+  2. 根节点
+  3. 父节点
+  4. 子节点
+  5. 叶子节点（没有子节点的节点）
+  6. 节点的权（节点值）
+  7. 路径（从root节点找到该节点的路线）
+  8. 层（同一排的节点）
+  9. 子树
+  10. 树的高度（最大层数）
+  11. 森林（多颗子树构成森林）
+
+
+
+### 二叉树
+
+- 基本介绍
+  1. 树的种类有很多，每个节点**最多只能有两个子节点**的一种形式称为二叉树。
+  2. 二叉树的子节点分为**左节点**和**右节点**
+  3. 如果该二叉树的所有叶子节点都在最后一层，并且**节点总数 = 2^n-1，n为层数**，则我们称为**满二叉树**
+  4. 如果该二叉树的所有叶子节点都在最后一层或者倒数第二层，而且**最后一层的叶子节点在左边连续**，**倒数第二层的叶子节点在右边连续**，我们称为**完全二叉树**
+
+<img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\erchaTree.png" alt="二叉树" style="zoom:80%;" />
+
+- **二叉树的遍历**
+  1. 前序遍历：**先输出父节点**，再遍历左子树和右子树
+  2. 中序遍历：先遍历左子树，**再输出父节点**，再遍历右子树
+  3. 后序遍历：先遍历左子树，再遍历右子树，**最后输出父节点**
+  4. 小结：**根据父节点的输出顺序**就可以**确定**是前序、中序还是后序
+  
+  ```js
+  // 二叉树
+  
+  // heroNode节点
+  class HeroNode {
+    #name;
+    #id;
+    #left = null; // 左指针
+    #right = null; // 右指针
+    constructor(id, name) {
+      this.#id = id;
+      this.#name = name;
+    }
+  
+    getId() {
+      return this.#id;
+    }
+    setId(id) {
+      this.#id = id;
+    }
+    getName() {
+      return this.#name;
+    }
+    setName(name) {
+      this.#name = name;
+    }
+    getLeft() {
+      return this.#left;
+    }
+    setLeft(node) {
+      this.#left = node;
+    }
+    getRight() {
+      return this.#right;
+    }
+    setRight(node) {
+      this.#right = node;
+    }
+  
+    // 前序遍历
+    preOrder() {
+      console.log({id:this.#id,name:this.#name});
+      // 递归向左子树前序遍历
+      if (this.#left != null) {
+        this.#left.preOrder();
+      }
+      // 递归向右子树前序遍历
+      if (this.#right != null) {
+        this.#right.preOrder();
+      }
+    }
+    // 中序遍历
+    infixOrder() {
+      // 先递归向左中序遍历左子树
+      if (this.#left != null) {
+        this.#left.infixOrder();
+      }
+      // 输出父节点
+      console.log({id:this.#id,name:this.#name});
+      // 再递归向右中序遍历右子树
+      if (this.#right != null) {
+        this.#right.infixOrder();
+      }
+    }
+    // 后序遍历
+    postOrder() {
+      // 先递归向左后序遍历左子树
+      if (this.#left != null) {
+        this.#left.postOrder();
+      }
+      // 再递归向右后序遍历右子树
+      if (this.#right != null) {
+        this.#right.postOrder();
+      }
+      // 输出父节点
+      console.log({id:this.#id,name:this.#name});
+    }
+  }
+  
+  // 创建二叉树
+  class BinaryTree{
+      #root = null
+      constructor(root){
+          this.#root = root
+      }
+  
+      // 前序遍历
+      preOrder(){
+          if(this.#root != null){
+              this.#root.preOrder()
+          }else{
+              console.log("二叉树为空，无法遍历");
+          }
+      }
+      // 中序遍历
+      infixOrder(){
+          if(this.#root != null){
+              this.#root.infixOrder()
+          }else{
+              console.log("二叉树为空，无法遍历");
+          }
+      }
+      // 后序遍历
+      postOrder(){
+          if(this.#root != null){
+              this.#root.postOrder()
+          }else{
+              console.log("二叉树为空，无法遍历");
+          }
+      }
+  }
+  
+  
+  // 实例几个节点
+  const root = new HeroNode(1,'fc')
+  const heroNode2 = new HeroNode(2,'ly')
+  const heroNode3 = new HeroNode(3,'fy')
+  const heroNode4 = new HeroNode(4,'John')
+  const heroNode5 = new HeroNode(5,'Milk')
+  
+  root.setLeft(heroNode2)
+  root.setRight(heroNode3)
+  heroNode3.setLeft(heroNode4)
+  heroNode3.setRight(heroNode5)
+  // 实例一颗二叉树
+  const binaryTree = new BinaryTree(root)
+  binaryTree.infixOrder()
+  
+  ```
+
+- **二叉树的查找**
+
+  -  HeroNode节点类
+
+  ```js
+    // 前序查找
+    preFind(id) {
+      // 先比对当前节点
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return this;
+      }
+      let result = null;
+      // 递归向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.preFind(id);
+      }
+      if (result != null) {
+        // 说明左子树找到
+        return result;
+      }
+      // 递归向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.preFind(id);
+      }
+      return result;
+    }
+    // 中序查找
+    infixFind(id) {
+      let result = null;
+      // 先向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.infixFind(id);
+      }
+      if (result != null) {
+        return result;
+      }
+      // 再比较当前
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return this;
+      }
+      // 向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.infixFind(id);
+      }
+      return result;
+    }
+    // 后续查找
+    postFind(id) {
+      let result = null;
+      // 向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.postFind(id);
+      }
+      if (result != null) {
+        return result;
+      }
+      // 向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.postFind(id);
+      }
+      // 比较当前
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return true;
+      }
+      return result;
+    }
+  ```
+
+- BinaryTree类
+
+  ```js
+    // 前序查找
+    preFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.preFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+    // 中序查找
+    infixFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.infixFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+    // 后序查找
+    postFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.postFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+  ```
+
+
+
+- **二叉树节点的删除**
+
+  1. 如果删除的节点是叶子节点，则直接删除该节点
+  2. 如果删除的节点是非叶子节点，则删除该子树
+  3. 因为二叉树是**单向**的，因此我们需要判断的是**当前节点的子节点**是否为我们要**删除的节点**，而不能判断当前节点是否为待删除节点
+  4. 如果当前节点的**左子节点**不为空，且左子节点就是要删除的节点，就将`this.#left = null`，并结束递归
+  5. 如果当前节点的**右子节点**不为空，且右子节点就是要删除的节点，就将`this.#right= null`，并结束递归
+  6. 如果第4和第5都没删除节点，则继续**递归删除**
+
+- **代码实现**
+
+  - HeroNode类
+
+    ```js
+      // 节点的删除
+      deleteNode(id) {
+        // 如果当前节点的左子节点不为空，且左子节点就是要删除的节点，就将this.#left = null，并结束递归
+        if (this.#left != null && this.#left.getId() == id) {
+          this.#left = null;
+          return;
+        }
+        // 如果当前节点的右子节点不为空，且右子节点就是要删除的节点，就将this.#right= null，并结束递归
+        if (this.#right != null && this.#right.getId() == id) {
+          this.#right = null;
+          return;
+        }
+        // 向左子树递归删除
+        if (this.#left != null) {
+          this.#left.deleteNode(id);
+        }
+        // 向右子树递归删除
+        if (this.#right != null) {
+          this.#right.deleteNode(id);
+        }
+      }
+    ```
+
+  - BinaryTree类
+
+    ```js
+      // 节点的删除
+      deleteNode(id) {
+        if (this.#root != null) {
+          if (this.#root.getId() == id) {
+            // 先看删除的是否为根节点
+            this.#root = null;
+            return;
+          }else{
+            // 对根节点调用deleteNode，递归删除节点
+            this.#root.deleteNode(id)
+          }
+        }else{
+          console.log("二叉树为空，无法删除");
+        }
+      }
+    ```
+
+- **整体代码实现**
+
+  ```js
+  // 二叉树
+  
+  // heroNode节点
+  class HeroNode {
+    #name;
+    #id;
+    #left = null; // 左指针
+    #right = null; // 右指针
+    constructor(id, name) {
+      this.#id = id;
+      this.#name = name;
+    }
+  
+    getId() {
+      return this.#id;
+    }
+    setId(id) {
+      this.#id = id;
+    }
+    getName() {
+      return this.#name;
+    }
+    setName(name) {
+      this.#name = name;
+    }
+    setLeft(node) {
+      this.#left = node;
+    }
+    setRight(node) {
+      this.#right = node;
+    }
+    // 重写toString
+    toString() {
+      console.log(`{id：${this.#id},name:${this.#name}}`);
+    }
+  
+    // 前序遍历
+    preOrder() {
+      console.log({ id: this.#id, name: this.#name });
+      // 递归向左子树前序遍历
+      if (this.#left != null) {
+        this.#left.preOrder();
+      }
+      // 递归向右子树前序遍历
+      if (this.#right != null) {
+        this.#right.preOrder();
+      }
+    }
+    // 中序遍历
+    infixOrder() {
+      // 先递归向左中序遍历左子树
+      if (this.#left != null) {
+        this.#left.infixOrder();
+      }
+      // 输出父节点
+      console.log({ id: this.#id, name: this.#name });
+      // 再递归向右中序遍历右子树
+      if (this.#right != null) {
+        this.#right.infixOrder();
+      }
+    }
+    // 后序遍历
+    postOrder() {
+      // 先递归向左后序遍历左子树
+      if (this.#left != null) {
+        this.#left.postOrder();
+      }
+      // 再递归向右后序遍历右子树
+      if (this.#right != null) {
+        this.#right.postOrder();
+      }
+      // 输出父节点
+      console.log({ id: this.#id, name: this.#name });
+    }
+  
+    // 前序查找
+    preFind(id) {
+      // 先比对当前节点
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return this;
+      }
+      let result = null;
+      // 递归向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.preFind(id);
+      }
+      if (result != null) {
+        // 说明左子树找到
+        return result;
+      }
+      // 递归向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.preFind(id);
+      }
+      return result;
+    }
+    // 中序查找
+    infixFind(id) {
+      let result = null;
+      // 先向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.infixFind(id);
+      }
+      if (result != null) {
+        return result;
+      }
+      // 再比较当前
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return this;
+      }
+      // 向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.infixFind(id);
+      }
+      return result;
+    }
+    // 后序查找
+    postFind(id) {
+      let result = null;
+      // 向左遍历查找
+      if (this.#left != null) {
+        result = this.#left.postFind(id);
+      }
+      if (result != null) {
+        return result;
+      }
+      // 向右遍历查找
+      if (this.#right != null) {
+        result = this.#right.postFind(id);
+      }
+      // 比较当前
+      if (this.#id == id) {
+        console.log("找到id为:" + id + "的角色，其名为：" + this.#name);
+        return true;
+      }
+      return result;
+    }
+  
+    // 节点的删除
+    deleteNode(id) {
+      // 如果当前节点的左子节点不为空，且左子节点就是要删除的节点，就将this.#left = null，并结束递归
+      if (this.#left != null && this.#left.getId() == id) {
+        this.#left = null;
+        return;
+      }
+      // 如果当前节点的右子节点不为空，且右子节点就是要删除的节点，就将this.#right= null，并结束递归
+      if (this.#right != null && this.#right.getId() == id) {
+        this.#right = null;
+        return;
+      }
+      // 向左子树递归删除
+      if (this.#left != null) {
+        this.#left.deleteNode(id);
+      }
+      // 向右子树递归删除
+      if (this.#right != null) {
+        this.#right.deleteNode(id);
+      }
+    }
+  }
+  
+  // 创建二叉树
+  class BinaryTree {
+    #root = null;
+    constructor(root) {
+      this.#root = root;
+    }
+  
+    // 前序遍历
+    preOrder() {
+      if (this.#root != null) {
+        this.#root.preOrder();
+      } else {
+        console.log("二叉树为空，无法遍历");
+      }
+    }
+    // 中序遍历
+    infixOrder() {
+      if (this.#root != null) {
+        this.#root.infixOrder();
+      } else {
+        console.log("二叉树为空，无法遍历");
+      }
+    }
+    // 后序遍历
+    postOrder() {
+      if (this.#root != null) {
+        this.#root.postOrder();
+      } else {
+        console.log("二叉树为空，无法遍历");
+      }
+    }
+    // 前序查找
+    preFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.preFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+    // 中序查找
+    infixFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.infixFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+    // 后序查找
+    postFind(id) {
+      if (this.#root != null) {
+        let flag = this.#root.postFind(id);
+        if (flag) {
+          flag.toString();
+        } else {
+          console.log("未找到id为" + id + "的角色");
+        }
+      } else {
+        console.log("二叉树为空，无法查找");
+      }
+    }
+  
+    // 节点的删除
+    deleteNode(id) {
+      if (this.#root != null) {
+        if (this.#root.getId() == id) {
+          // 先看删除的是否为根节点
+          this.#root = null;
+          return;
+        }else{
+          // 对根节点调用deleteNode，递归删除节点
+          this.#root.deleteNode(id)
+        }
+      }else{
+        console.log("二叉树为空，无法删除");
+      }
+    }
+  }
+  
+  // 实例几个节点
+  const root = new HeroNode(1, "fc");
+  const heroNode2 = new HeroNode(2, "ly");
+  const heroNode3 = new HeroNode(3, "fy");
+  const heroNode4 = new HeroNode(4, "John");
+  const heroNode5 = new HeroNode(5, "Milk");
+  
+  root.setLeft(heroNode2);
+  root.setRight(heroNode3);
+  heroNode3.setLeft(heroNode4);
+  heroNode3.setRight(heroNode5);
+  // 实例一颗二叉树
+  const binaryTree = new BinaryTree(root);
+  binaryTree.deleteNode(5);
+  binaryTree.preOrder()
+  
+  ```
+
+
+
+### 顺序存储二叉树
+
+- **基本说明**：从数据存储来看，**数组存储方式**和**树的存储方式**可以**相互转换**，即数组可以转换成树，树叶可以转换成数组
+
+- 所谓顺序存储二叉树，就是**将数据以数组的形式存储**，但是访问时仍可以以**前序、中序、后序**的方式遍历
+
+  <img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\orderSaveBinaryTree.png" style="zoom:80%;" />
+
+- **代码实现**
+
+  ```js
+  ![xiansuohuaErChaTree](C:\Users\Administrator\Desktop\数据结构和算法\img\树\xiansuohuaErChaTree.png)![xiansuohuaErChaTree](C:\Users\Administrator\Desktop\数据结构和算法\img\树\xiansuohuaErChaTree.png)// 顺序存储二叉树
+  class ArrBinaryTree {
+    arr;
+    constructor(arr) {
+      this.arr = arr;
+    }
+  
+    // 前序遍历
+    preOrder(index = 0) {
+      // 判断当前数组是否为空
+      if (this.arr.length != 0) {
+        // 输出当前元素
+        console.log(this.arr[index]);
+        // 向左节点递归遍历并判断下标是否越界
+        if (2 * index + 1 < this.arr.length) {
+          this.preOrder(2 * index + 1);
+        }
+        // 向右递归遍历并判断下标是否越界
+        if (2 * index + 2 < this.arr.length) {
+          this.preOrder(2 * index + 2);
+        }
+      } else {
+        console.log("数组为空，无法前序遍历");
+      }
+    }
+  }
+  
+  
+  let arr = [1,2,3,4,5,6,7]
+  let arrBinaryTree = new ArrBinaryTree(arr)
+  arrBinaryTree.preOrder()
+  
+  ```
+
+  
+
+### 线索化二叉树（Threaded BinaryTree）
+
+- **基本介绍**
+
+  1. n个节点的二叉链表中含有 n + 1【公式：2n - (n - 1) = n+1】个空指针域。利用二叉链表中的空指针域，存放**指向该节点**在**某种遍历次序**下的前驱和后驱节点的指针，这种附加的指针称为**线索**
+  2. 这种加上了线索的二叉链表称为**线索链表**，相应的二叉树称为**线索二叉树**。根据线索性质的不同，线索二叉树可分为**前序线索二叉树**、**中序线索二叉树**和**后序线索二叉树**三种
+  3. 一个节点的前一个节点，称为**前驱**节点
+  4. 一个节点的后一个节点，称为**后驱**节点
+
+- **二叉树的线索化**
+
+  <img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\xiansuohuaErChaTree.png" alt="二叉树的线索化" style="zoom:80%;" />
+
+- **代码实现**
+
+  ```js
+  // 线索化二叉树--以中序线索化为例
+  
+  // heroNode节点
+  class HeroNode {
+    #name;
+    #id;
+    #left = null; // 左指针
+    #right = null; // 右指针
+    #leftType; // 左指针的类型，0表示指向节点，1表示指向前驱节点
+    #rightType; // 右指针的类型，0表示指向节点，1表示指向前驱节点
+    constructor(id, name) {
+      this.#id = id;
+      this.#name = name;
+    }
+  
+    setLeftType(type) {
+      this.#leftType = type;
+    }
+    setRightType(type) {
+      this.#rightType = type;
+    }
+    getLeft() {
+      return this.#left;
+    }
+    getRight() {
+      return this.#right;
+    }
+    setLeft(node) {
+      this.#left = node;
+    }
+    setRight(node) {
+      this.#right = node;
+    }
+    toString(){
+      return `{id:${this.#id},Name:${this.#name}}}`
+    }
+  }
+  
+  // 线索化二叉树
+  class ThreadedBinaryTree {
+    #root = null;
+    // 当前节点指向前驱节点的指针（prePointer总是指向当前节点的前一个节点）
+    prePointer = null;
+    constructor(root) {
+      this.#root = root;
+    }
+  
+    // 线索化二叉树 node:当前需要线索化的节点
+    threadedNodes(node) {
+      // 如果当前节点为null则无法线索化
+      if (node == null) return;
+  
+      // 先线索化左子树
+      this.threadedNodes(node.getLeft());
+  
+      // 线索化当前节点
+      // 1. 处理当前节点的前驱节点
+      if (node.getLeft() == null) {
+        // 让当前节点的左指针指向前驱节点
+        node.setLeft(this.prePointer);
+        // 修改当前节点左指针的类型
+        node.setLeftType(1);
+      }
+      // 2. 处理后继节点（是在下一次递归处理上一次的后继节点，下次递归的prePointer就是上次的node）
+      if (this.prePointer != null && this.prePointer.getRight() == null) {
+          this.prePointer.setRight(node)
+          this.prePointer.setRightType(1)
+      }
+      // 让prePointer指针指向这次的node节点
+      this.prePointer = node
+  
+      // 线索化右子树
+      this.threadedNodes(node.getRight());
+    }
+  
+  }
+  
+  // 实例几个节点
+  const rootNode = new HeroNode(1, "fc");
+  const heroNode2 = new HeroNode(3, "ly");
+  const heroNode3 = new HeroNode(6, "fy");
+  const heroNode4 = new HeroNode(8, "John");
+  const heroNode5 = new HeroNode(10, "Milk");
+  const heroNode6 = new HeroNode(14, "King");
+  
+  const threadedBinaryNodes = new ThreadedBinaryTree(rootNode)
+  rootNode.setLeft(heroNode2)
+  rootNode.setRight(heroNode3)
+  heroNode2.setLeft(heroNode4)
+  heroNode2.setRight(heroNode5)
+  heroNode3.setLeft(heroNode6)
+  
+  threadedBinaryNodes.threadedNodes(rootNode)
+  console.log(heroNode5.getLeft().toString()); 
+  ```
+
+- **中序线索二叉树的遍历**
+
+  - 线索二叉树的遍历和普通二叉树的遍历不同，需要注意
+
+  ```js
+    // 中序线索化二叉树的遍历
+    threadedList() {
+      let node = this.#root;
+      // 当node不为空便一直找
+      while (node != null) {
+        // 循环找到leftType == 1的节点，第一个找到的就是id为8的节点
+        // node后面会随着遍历而变化
+        while (node.getLeftType() == 0) {
+          node = node.getLeft()
+        }
+        // 出了上面循环后，此时node就是id为8的节点
+        console.log(node.toString());
+  
+        // 如果当前节点的右指针指向的是后继节点，就一直输出
+        while(node.getRightType() == 1){
+          // 获取到当前节点的后继节点
+          node = node.getRight()
+          console.log(node.toString());
+        }
+        // 替换这个遍历的节点
+        node = node.getRight()
+      }
+    }
   ```
 
   
