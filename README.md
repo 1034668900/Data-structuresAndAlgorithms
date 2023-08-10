@@ -3543,4 +3543,155 @@ findWay(map,1,1)
     }
   ```
 
+
+
+
+### 赫夫曼树
+
+- 基本介绍
+
+  1. 给定 n 个权值作为 n 个叶子结点，构造一个二叉树，若该树的**带权路径长度（wpl）**达到最小，称这样的二叉树为**最优二叉树**，也称为**哈夫曼树（Huffman Tree）**，还有的书翻译为**霍夫曼树**
+  2. 赫夫曼树是带权路径长度最短的树，权值较大的结点离根较近
+
+- 赫夫曼树几个重要概念
+
+  1. **路径和路径长度**：在一颗树中，**从一个节点往下可以达到的孩子或孙子节点之间的通路**，称为路径。通路中**分支的数目**称为**路径长度**。若规定根节点的层数为1，则从根节点到第L层节点的路径长度为 L - 1
+
+  2. **节点的权及带权路径长度**：若将树中节点赋给一个有着某种含义的数值，则这个数值称为该节点的权。节点的带权路径长度为：从根节点到该节点之间的路径长度与该节点的权的乘积
+
+  3. **树的带权路径长度**：树的带权路径长度规定为**所有叶子节点**的**带权路径长度之和**，记为**WPL（weighted path length）**，权值越大的节点离根节点越近的二叉树才是最优二叉树。
+
+  4. **WPL**最小的就是**赫夫曼树**
+
+     ![](C:\WorkSpace\数据结构和算法\Data-structuresAndAlgorithms\img\树\wpl.png)
+
+- **赫夫曼树创建思路分析**
+
+  - 给定一个数列 `[13,7,8,3,29,6,1]`,要求转成一颗赫夫曼树
+
+  - **思路分析**
+
+    1. 将每一个数据从小到大进行排序，每个数据都是一个节点，每个节点可以看成是一颗最简单的二叉树
+    2. 取出根节点权值最小的两颗二叉树
+    3. 组成一颗新的二叉树，该新的二叉树的根节点的权值是前面两颗二叉树根节点权值的和
+    4. 再将这颗新的二叉树，以根节点的权值大小再次排序，不断重复 1-2-3-4的步骤，知道数列中，所有的数据都被处理，就得到一颗赫夫曼树
+
+    <img src="C:\WorkSpace\数据结构和算法\Data-structuresAndAlgorithms\img\树\HefumanTree.png" style="zoom: 67%;" />
+
+- **代码实现**
+
+  - **特别注意**对数组进行排序时：只有第一次传入的数组内部是数字，后面传入的都是节点数组，排序要区别处理
+
+  ```js
+  // 赫夫曼树
   
+  // 创建节点类
+  class Node {
+    // 节点的权值
+    value;
+    // 指向左子节点
+    left;
+    // 指向右子节点
+    right;
+    // 构造函数
+    constructor(value) {
+      this.value = value;
+    }
+  }
+  
+  class HuffmanTree {
+    /**
+     * 根据传入的数组，将其从小到大排序后，
+     * 将每个数据都转换为节点存储在新数组中返回
+     * 注意：只有第一次传入的数组内部是数字，后面传入的都是节点数组，排序要区别处理
+     * @param {Array} arr
+     */
+    creatOrderlyNodeList(arr) {
+      if (!(arr instanceof Array)) return;
+      if (typeof arr[0] == "number") {
+        // 首次传入的是数字数组时的处理
+        // 从小到大排序
+        arr.sort((a, b) => a - b);
+        let newArr = [];
+        arr.forEach((item) => newArr.push(new Node(item)));
+        return newArr;
+      } else {
+        // 传入的是节点数组时的排序处理（选择排序）
+        let minNode = 0;
+        let minIndex = 0;
+        for (let i = 0; i < arr.length; i++) {
+          minNode = arr[i];
+          minIndex = i;
+          for (let j = i + 1; j < arr.length; j++) {
+            if (minNode.value > arr[j].value) {
+              minNode = arr[j];
+              minIndex = j;
+            }
+          }
+          if (minIndex != i) {
+            arr[minIndex] = arr[i];
+            arr[i] = minNode;
+          }
+        }
+        return arr;
+      }
+    }
+  
+    /**
+     * 创建赫夫曼树
+     * @param {Array} arr
+     */
+    createHuffmanTree(arr) {
+      if (!(arr instanceof Array)) return;
+      // 1.将数据从小到大排序，并将每个数据转换为节点
+      let orderlyArr = this.creatOrderlyNodeList(arr);
+      // 2.取出根节点权值最小的两颗二叉树,并将其组成一颗新的二叉树
+      let parentNode = null;
+      let leftNode = null;
+      let rightNode = null;
+      let value = 0;
+      while (true) {
+        if (orderlyArr.length == 1) break;
+        leftNode = orderlyArr.shift();
+        rightNode = orderlyArr.shift();
+        value = leftNode.value + rightNode.value;
+        parentNode = new Node(value);
+        parentNode.left = leftNode;
+        parentNode.right = rightNode;
+        orderlyArr.push(parentNode);
+        // 重新排序
+        orderlyArr = this.creatOrderlyNodeList(orderlyArr);
+      }
+      // 处理完后便得到一颗赫夫曼树,将其前序遍历打印看看
+      this.preOrder(orderlyArr[0]);
+    }
+  
+    /**
+     * 赫夫曼树的前序遍历
+     * @param {Node} huffmanTree
+     */
+    preOrder(huffmanTree) {
+      if (huffmanTree == null) return;
+      console.log(huffmanTree.value);
+      this.preOrder(huffmanTree.left);
+      this.preOrder(huffmanTree.right);
+    }
+  }
+  
+  let huffmanTree = new HuffmanTree();
+  let arr = [13, 7, 8, 3, 29, 6, 1];
+  huffmanTree.createHuffmanTree(arr);
+  // result: 67 29 38 15 7 8 23 10 4 1 3 6
+  
+  ```
+
+
+
+### 赫夫曼编码
+
+- 基本介绍
+  1. 赫夫曼编码也翻译为**哈夫曼编码（Huffman Coding）**，是一种编码方式，属于一种程序算法
+  2. 赫夫曼编码是赫夫曼树在电讯通信中的经典的应用之一
+  3. 赫夫曼编码广泛地用于**数据文件压缩**。其**压缩率通常在20%~90%**之间
+  4. 赫夫曼是可变**字长**编码（VLC）的一种。是**Huffman**于1952年提出的一种编码方法，称之为最佳编码
+
