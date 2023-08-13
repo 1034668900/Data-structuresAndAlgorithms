@@ -2737,7 +2737,7 @@ findWay(map,1,1)
 
 
 
-## 树
+## 树（Tree）
 
 ### 树的常用术语
 
@@ -3551,13 +3551,13 @@ findWay(map,1,1)
 - 基本介绍
 
   1. 给定 n 个权值作为 n 个叶子结点，构造一个二叉树，若该树的**带权路径长度（wpl）**达到最小，称这样的二叉树为**最优二叉树**，也称为**哈夫曼树（Huffman Tree）**，还有的书翻译为**霍夫曼树**
-  2. 赫夫曼树是带权路径长度最短的树，权值较大的结点离根较近
+  2. **赫夫曼树是带权路径长度最短的树**，权值较大的结点离根较近
 
 - 赫夫曼树几个重要概念
 
   1. **路径和路径长度**：在一颗树中，**从一个节点往下可以达到的孩子或孙子节点之间的通路**，称为路径。通路中**分支的数目**称为**路径长度**。若规定根节点的层数为1，则从根节点到第L层节点的路径长度为 L - 1
 
-  2. **节点的权及带权路径长度**：若将树中节点赋给一个有着某种含义的数值，则这个数值称为该节点的权。节点的带权路径长度为：从根节点到该节点之间的路径长度与该节点的权的乘积
+  2. **节点的权及带权路径长度**：若将树中节点赋给一个有着某种含义的数值，则这个数值称为该节点的权。节点的带权路径长度为：从根节点到该节点之间的**路径长度与该节点的权的乘积**
 
   3. **树的带权路径长度**：树的带权路径长度规定为**所有叶子节点**的**带权路径长度之和**，记为**WPL（weighted path length）**，权值越大的节点离根节点越近的二叉树才是最优二叉树。
 
@@ -3574,7 +3574,7 @@ findWay(map,1,1)
     1. 将每一个数据从小到大进行排序，每个数据都是一个节点，每个节点可以看成是一颗最简单的二叉树
     2. 取出根节点权值最小的两颗二叉树
     3. 组成一颗新的二叉树，该新的二叉树的根节点的权值是前面两颗二叉树根节点权值的和
-    4. 再将这颗新的二叉树，以根节点的权值大小再次排序，不断重复 1-2-3-4的步骤，知道数列中，所有的数据都被处理，就得到一颗赫夫曼树
+    4. 再将这颗新的二叉树，以根节点的权值大小再次排序，不断重复 1-2-3-4的步骤，直到数列中，所有的数据都被处理，就得到一颗赫夫曼树
 
     <img src="C:\WorkSpace\数据结构和算法\Data-structuresAndAlgorithms\img\树\HefumanTree.png" style="zoom: 67%;" />
 
@@ -3694,3 +3694,750 @@ findWay(map,1,1)
   2. 赫夫曼编码是赫夫曼树在电讯通信中的经典的应用之一
   3. 赫夫曼编码广泛地用于**数据文件压缩**。其**压缩率通常在20%~90%**之间
   4. 赫夫曼是可变**字长**编码（VLC）的一种。是**Huffman**于1952年提出的一种编码方法，称之为最佳编码
+
+
+
+
+### 二叉排序树（BST： Binary Sort Tree）
+
+- **基本介绍**
+
+  - 对于二叉排序树的任何一个非叶子节点，要求左子节点的值比当前节点的值小，右子节点的值比当前节点的值大
+  - 如果有相同的值，则将其放在左、右子节点均可
+
+- **二叉排序树的创建和遍历**
+
+  ```js
+  // BInary Sort Tree
+  
+  // 节点类
+  class Node {
+    // 权
+    value;
+    left;
+    right;
+    constructor(value) {
+      this.value = value;
+    }
+  
+    /**
+     * 添加节点
+     * @param {*} node
+     */
+    addNode(node) {
+      // 比较添加节点和当前子树根节点得值
+      if (node.value < this.value) {
+        if (this.left == null) {
+          this.left = node;
+        } else {
+          // 当前子树根节点的左节点不为空则递归向左添加
+          this.left.addNode(node);
+        }
+      } else {
+        if (this.right == null) {
+          this.right = node;
+        } else {
+          this.right.addNode(node);
+        }
+      }
+    }
+  }
+  // 创建BST
+  class BST {
+    // 根节点
+    root;
+  
+    /**
+     * 创建BST
+     * @param {Array} arr
+     */
+    createBST(arr) {
+      if (!(arr instanceof Array)) return;
+      for (let i = 0; i < arr.length; i++) {
+        this.add(new Node(arr[i]));
+      }
+      console.log(this.root);
+    }
+    
+    add(node) {
+      if (this.root == null) {
+        this.root = node;
+      } else {
+        this.root.addNode(node);
+      }
+    }
+    getRoot(){
+      return this.root
+    }
+  
+    /**
+     * 中序遍历BST
+     */
+    infixOrder(node) {
+      if (this.root == null) return;
+      if (node == null) return;
+      if (node.left !== null) this.infixOrder(node.left);
+      console.log("中序遍历权值为：", node.value);
+      if (node.right !== null) this.infixOrder(node.right);
+    }
+  }
+  
+  let arr = [7, 3, 10, 12, 5, 1, 9];
+  let bst = new BST();
+  bst.createBST(arr);
+  bst.infixOrder(bst.getRoot());// 1,3,5,7,9,10,12
+  
+  ```
+
+- **二叉排序树的删除**
+
+  - 二叉排序树的删除情况比较复杂，有下面三种情况需要考虑
+    	1. 删除叶子节点
+     	2. 删除只有一颗子树的节点
+     	3. 删除有两颗子树的节点（**2，3需要考虑删除节点被删除后其子节点的位置**）
+  - 要删除目标节点，我们必须拿到其父节点
+
+  ```js
+  // BInary Sort Tree
+  
+  // 节点类
+  class Node {
+    // 权
+    value;
+    left;
+    right;
+    constructor(value) {
+      this.value = value;
+    }
+  
+    /**
+     * 添加节点
+     * @param {*} node
+     */
+    addNode(node) {
+      // 比较添加节点和当前子树根节点得值
+      if (node.value < this.value) {
+        if (!this.left) {
+          this.left = node;
+        } else {
+          // 当前子树根节点的左节点不为空则递归向左添加
+          this.left.addNode(node);
+        }
+      } else {
+        if (!this.right) {
+          this.right = node;
+        } else {
+          this.right.addNode(node);
+        }
+      }
+    }
+  
+    /**
+     * 根据权值寻找被删除节点，并将其返回
+     * @param {Node} node
+     * @return 如果找到则返回该节点，否则返回null
+     */
+    findDelNode(value) {
+      if (this.value == value) return this;
+      if (value < this.value) {
+        // 左子节点
+        if (!this.left) return null;
+        return this.left.findDelNode(value);
+      } else {
+        // 右子节点
+        if (!this.right) return null;
+        return this.right.findDelNode(value);
+      }
+    }
+    /**
+     *
+     * @param {*} value
+     * @return 找到被删除节点的父节点
+     */
+    findParentNode(value) {
+      if (
+        (this.left && this.left.value == value) ||
+        (this.right && this.right.value == value)
+      ) {
+        return this;
+      } else {
+        if (this.left && value < this.value) {
+          return this.left.findParentNode(value);
+        } else if (this.right !== null && value >= this.value) {
+          return this.right.findParentNode(value);
+        } else {
+          return null;
+        }
+      }
+    }
+  }
+  // 创建BST
+  class BST {
+    // 根节点
+    root;
+  
+    /**
+     * 创建BST
+     * @param {Array} arr
+     */
+    createBST(arr) {
+      if (!(arr instanceof Array)) return;
+      for (let i = 0; i < arr.length; i++) {
+        this.add(new Node(arr[i]));
+      }
+    }
+  
+    add(node) {
+      if (this.root == null) {
+        this.root = node;
+      } else {
+        this.root.addNode(node);
+      }
+    }
+    getRoot() {
+      return this.root;
+    }
+  
+    /**
+     * 重新封装节点的查找方法
+     * @param {*} value
+     */
+    findDelNode(value) {
+      if (this.root == null) return null;
+      return this.root.findDelNode(value);
+    }
+  
+    /**
+     * 重新封装查找节点的父节点的方法
+     * @param {*} value
+     */
+    findParentNode(value) {
+      if (this.root == null) return null;
+      return this.root.findParentNode(value);
+    }
+  
+    /**
+     * BST节点的删除(三种情况)
+     * 1. 删除叶子节点
+     * 2. 删除只有一颗子树的节点
+     * 3. 删除有两颗子树的节点（2，3需要考虑删除节点被删除后其子节点的位置）
+     * 4. 要删除目标节点，我们必须拿到其父节点
+     * 5. 被删除节点要存在
+     *
+     * 调用封装的查找方法找到目标节点和其父节点
+     * @param {*} value
+     */
+    delNode(value) {
+      var targetNode = this.findDelNode(value);
+      if (!targetNode) {
+        console.log("该节点不存在");
+        return;
+      } else {
+        // 获取其父节点
+        var parentNode = this.findParentNode(value);
+        // 判断父节点是否存在（删除的节点是根节点时就不存咋父节点）
+        if (!parentNode) {
+          // 删除节点为根节点
+          if(targetNode.left && targetNode.right){
+              // 根节点左右都有子节点
+              var leftMaxValue = this.delLeftMaxNode(targetNode)
+              targetNode.value = leftMaxValue
+          }else if(!targetNode.left && !targetNode.right){
+              // 只有根节点了
+              this.root = null
+          }else{
+              // 根节点只有一颗子树
+              if(targetNode.left){
+                  // 只有左子树
+                  this.root = targetNode.left
+              }else{
+                  // 只有右子树
+                  this.root = targetNode.right
+              }
+          }
+          return;
+        } else {
+          // 当被删除节点为叶子节点时
+          if (!targetNode.left && !targetNode.right) {
+            // 需要判断targetNode是parentNode的左子节点还是右子节点
+            if (parentNode.left && parentNode.left.value == value) {
+              // 左子节点
+              parentNode.left = null;
+              return;
+            } else if (parentNode.right && parentNode.right.value == value) {
+              // 右子节点
+              parentNode.right = null;
+              return;
+            }
+          } else if (targetNode.left && targetNode.right) {
+            // 当被删除节点有两颗子树
+            //(两种思路：从左子树找最大的使targetNode.value = leftMaxNode.value,并删除最大节点)
+            // 从右子树找最小的，删除并返回其值
+              var minNodeValue = this.delRightMinNode(targetNode.right)
+              targetNode.value = minNodeValue
+  
+          } else {
+            // 当被删除节点只有一颗子树,需要判断targetNode是parentNode的左节点还是右节点
+            if (targetNode.left) {
+              if (parentNode.left.value == targetNode.value) {
+                parentNode.left = targetNode.left;
+              } else {
+                parentNode.right = targetNode.left;
+              }
+            } else {
+              if (parentNode.left.value == targetNode.value) {
+                parentNode.left = targetNode.right;
+              } else {
+                parentNode.right = targetNode.right;
+              }
+            }
+          }
+        }
+      }
+    }
+  
+    /**
+     * 以传入的node为根节点，找到其右子树中权值最小的节点将其删除并返回值
+     * @param {*} targetNode 
+     */
+    delRightMinNode(targetNode){
+      var tempNode = targetNode
+      while(tempNode.left){
+          tempNode = tempNode.left
+      }
+      this.delNode(tempNode.value)
+      return tempNode.value
+    }
+    /**
+     * 以传入的node为根节点，找到其左子树中权值最大的节点将其删除并返回值
+     * @param {*} targetNode 
+     */
+    delLeftMaxNode(targetNode){
+      var tempNode = targetNode
+      while(tempNode.right){
+          tempNode = tempNode.right
+      }
+      this.delNode(tempNode.value)
+      return tempNode.value
+    }
+  
+    /**
+     * 中序遍历BST
+     */
+    infixOrder(node) {
+      if (this.root == null) return;
+      if (node == null) return;
+      if (node.left !== null) this.infixOrder(node.left);
+      console.log("中序遍历权值为：", node.value);
+      if (node.right !== null) this.infixOrder(node.right);
+    }
+  }
+  
+  let arr = [7, 3, 10, 12, 5, 1, 9, 2];
+  let bst = new BST();
+  bst.createBST(arr);
+  bst.delNode(2);
+  bst.infixOrder(bst.getRoot());
+  
+  ```
+
+
+
+
+### 平衡二叉树（AVL树）
+
+- BST存在的问题分析（**给定数列[1, 2, 3, 4, 5, 6, 7]形成的BST类似单链表**）
+
+  1. 左子树全部为空，从形式上看，更像一个单链表
+  2. 插入速度没有影响
+  3. 查询速度明显降低（因为需要依次比较），不能发挥BST的优势，因为每次都还需要比较左子树，其查询速度甚至比单链表还慢
+  4. **解决方案**-平衡二叉树（AVL）
+
+- 基本介绍
+
+  1. 平衡二叉树也叫平衡二叉搜索树（Self - balancing binary search tree）又被称为AVL树，可以保证查询效率较高
+  2. 具有以下**特点**：它是一棵空树或它的**左右两个子树的高度差的绝对值不超过1**，并且左右两个子树都是一颗平衡二叉树。平衡二叉树的常用实现方法有**红黑树**、**AVL**、**替罪羊树**、**Treap**、**伸展树**等**算法**
+  3. 平衡二叉树首先得是一颗**二叉排序树**
+
+- 左旋转
+
+  - 当右子树高度太高时，可以通过左旋转降低右子树的高度
+  - 需要先在节点类中写三个方法，分别获取**当前节点高度、当前节点的左子树高度、当前节点的右子树高度**
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\树\AVLTreeLeftRotate.png)
+
+- 右旋转
+
+  - 当左子树太高时，可以通过右旋转降低左子树的高度
+
+  ![](C:\Users\Administrator\Desktop\数据结构和算法\img\树\AVLTreeRightRotate.png)
+
+
+
+- **代码实现**
+
+  ```js
+  // AVL 树
+  
+  // 节点类
+  class Node {
+    // 权
+    value;
+    left;
+    right;
+    constructor(value) {
+      this.value = value;
+    }
+  
+    // 左旋转
+    leftRotate() {
+      // 以当前根节点的值创建新的节点
+      let newNode = new Node(this.value);
+      // 把新的节点的左子树设置成当前节点的左子树
+      newNode.left = this.left;
+      // 把新的节点的右子树设置成当前节点右子树的左子树
+      newNode.right = this.right.left;
+      // 把当前节点的值替换成右子节点的值
+      this.value = this.right.value;
+      // 把当前节点的右子树设置成右子树的右子树
+      this.right = this.right.right;
+      // 把当前节点的左子树设置成新的节点
+      this.left = newNode;
+    }
+  
+    // 右旋转
+    rightRotate() {
+      // 以当前节点的值创建新的节点
+      let newNode = new Node(this.value);
+      // 把新节点的右子树设置为当前节点的右子树
+      newNode.right = this.right;
+      // 把新节点左子树设置为当前节点的左子树的右子树
+      newNode.left = this.left.right;
+      // 把当前节点的值换为左子节点的值
+      this.value = this.left.value;
+      // 把当前节点的左子树设置为左子树的左子树
+      this.left = this.left.left;
+      // 把当前节点的右子树设置为新节点
+      this.right = newNode;
+    }
+  
+    // 返回当前节点的高度
+    getHeight() {
+      return (
+        Math.max(
+          !this.left ? 0 : this.left.getHeight(),
+          !this.right ? 0 : this.right.getHeight()
+        ) + 1
+      );
+    }
+  
+    // 返回左子树的高度
+    getLeftHeight() {
+      if (this.left) {
+        return this.left.getHeight();
+      }
+      return 0;
+    }
+    // 返回右子树的高度
+    getRightHeight() {
+      if (this.right) {
+        return this.right.getHeight();
+      }
+      return 0;
+    }
+  
+    /**
+     * 添加节点
+     * @param {*} node
+     */
+    addNode(node) {
+      // 比较添加节点和当前子树根节点得值
+      if (node.value < this.value) {
+        if (!this.left) {
+          this.left = node;
+        } else {
+          // 当前子树根节点的左节点不为空则递归向左添加
+          this.left.addNode(node);
+        }
+      } else {
+        if (!this.right) {
+          this.right = node;
+        } else {
+          this.right.addNode(node);
+        }
+      }
+  
+      // 添加完后判断右子树和左子树的高度
+      if (this.getRightHeight() - this.getLeftHeight() > 1) {
+        // 如果当前节点的右子树的左子树高度大于它的右子树的高度
+        if (
+          this.right &&
+          this.right.getLeftHeight() > this.right.getRightHeight()
+        ) {
+          // 需要先对右子树进行右旋转，再对当前节点左旋转
+          this.right.rightRotate();
+          this.leftRotate();
+        } else {
+          // 左旋转
+          this.leftRotate();
+        }
+        return 
+      }
+      if (this.getLeftHeight() - this.getRightHeight() > 1) {
+        // 需要判断当前节点的左子树的右子树高度是否大于其左子树高度
+        if (this.left && this.left.getRightHeight() > this.left.getLeftHeight()) {
+          // 需要先对子树左旋转，再对当前节点右旋转
+          this.left.leftRotate();
+          this.rightRotate();
+        } else {
+          // 右旋转
+          this.rightRotate();
+        }
+        return
+      }
+    }
+  
+    /**
+     * 根据权值寻找被删除节点，并将其返回
+     * @param {Node} node
+     * @return 如果找到则返回该节点，否则返回null
+     */
+    findDelNode(value) {
+      if (this.value == value) return this;
+      if (value < this.value) {
+        // 左子节点
+        if (!this.left) return null;
+        return this.left.findDelNode(value);
+      } else {
+        // 右子节点
+        if (!this.right) return null;
+        return this.right.findDelNode(value);
+      }
+    }
+    /**
+     *
+     * @param {*} value
+     * @return 找到被删除节点的父节点
+     */
+    findParentNode(value) {
+      if (
+        (this.left && this.left.value == value) ||
+        (this.right && this.right.value == value)
+      ) {
+        return this;
+      } else {
+        if (this.left && value < this.value) {
+          return this.left.findParentNode(value);
+        } else if (this.right !== null && value >= this.value) {
+          return this.right.findParentNode(value);
+        } else {
+          return null;
+        }
+      }
+    }
+  }
+  
+  // 创建AVL
+  class AVL {
+    // 根节点
+    root;
+  
+    /**
+     * 创建AVL
+     * @param {Array} arr
+     */
+    createAVL(arr) {
+      if (!(arr instanceof Array)) return;
+      for (let i = 0; i < arr.length; i++) {
+        this.add(new Node(arr[i]));
+      }
+    }
+  
+    add(node) {
+      if (!this.root) {
+        this.root = node;
+      } else {
+        this.root.addNode(node);
+      }
+    }
+    getRoot() {
+      return this.root;
+    }
+  
+    /**
+     * 重新封装节点的查找方法
+     * @param {*} value
+     */
+    findDelNode(value) {
+      if (this.root == null) return null;
+      return this.root.findDelNode(value);
+    }
+  
+    /**
+     * 重新封装查找节点的父节点的方法
+     * @param {*} value
+     */
+    findParentNode(value) {
+      if (this.root == null) return null;
+      return this.root.findParentNode(value);
+    }
+  
+    /**
+     * AVL节点的删除(三种情况)
+     * 1. 删除叶子节点
+     * 2. 删除只有一颗子树的节点
+     * 3. 删除有两颗子树的节点（2，3需要考虑删除节点被删除后其子节点的位置）
+     * 4. 要删除目标节点，我们必须拿到其父节点
+     * 5. 被删除节点要存在
+     *
+     * 调用封装的查找方法找到目标节点和其父节点
+     * @param {*} value
+     */
+    delNode(value) {
+      var targetNode = this.findDelNode(value);
+      if (!targetNode) {
+        console.log("该节点不存在");
+        return;
+      } else {
+        // 获取其父节点
+        var parentNode = this.findParentNode(value);
+        // 判断父节点是否存在（删除的节点是根节点时就不存咋父节点）
+        if (!parentNode) {
+          // 删除节点为根节点
+          if (targetNode.left && targetNode.right) {
+            // 根节点左右都有子节点
+            var leftMaxValue = this.delLeftMaxNode(targetNode);
+            targetNode.value = leftMaxValue;
+          } else if (!targetNode.left && !targetNode.right) {
+            // 只有根节点了
+            this.root = null;
+          } else {
+            // 根节点只有一颗子树
+            if (targetNode.left) {
+              // 只有左子树
+              this.root = targetNode.left;
+            } else {
+              // 只有右子树
+              this.root = targetNode.right;
+            }
+          }
+          return;
+        } else {
+          // 当被删除节点为叶子节点时
+          if (!targetNode.left && !targetNode.right) {
+            // 需要判断targetNode是parentNode的左子节点还是右子节点
+            if (parentNode.left && parentNode.left.value == value) {
+              // 左子节点
+              parentNode.left = null;
+              return;
+            } else if (parentNode.right && parentNode.right.value == value) {
+              // 右子节点
+              parentNode.right = null;
+              return;
+            }
+          } else if (targetNode.left && targetNode.right) {
+            // 当被删除节点有两颗子树
+            //(两种思路：从左子树找最大的使targetNode.value = leftMaxNode.value,并删除最大节点)
+            // 从右子树找最小的，删除并返回其值
+            var minNodeValue = this.delRightMinNode(targetNode.right);
+            targetNode.value = minNodeValue;
+          } else {
+            // 当被删除节点只有一颗子树,需要判断targetNode是parentNode的左节点还是右节点
+            if (targetNode.left) {
+              if (parentNode.left.value == targetNode.value) {
+                parentNode.left = targetNode.left;
+              } else {
+                parentNode.right = targetNode.left;
+              }
+            } else {
+              if (parentNode.left.value == targetNode.value) {
+                parentNode.left = targetNode.right;
+              } else {
+                parentNode.right = targetNode.right;
+              }
+            }
+          }
+        }
+      }
+    }
+  
+    /**
+     * 以传入的node为根节点，找到其右子树中权值最小的节点将其删除并返回值
+     * @param {*} targetNode
+     */
+    delRightMinNode(targetNode) {
+      var tempNode = targetNode;
+      while (tempNode.left) {
+        tempNode = tempNode.left;
+      }
+      this.delNode(tempNode.value);
+      return tempNode.value;
+    }
+    /**
+     * 以传入的node为根节点，找到其左子树中权值最大的节点将其删除并返回值
+     * @param {*} targetNode
+     */
+    delLeftMaxNode(targetNode) {
+      var tempNode = targetNode;
+      while (tempNode.right) {
+        tempNode = tempNode.right;
+      }
+      this.delNode(tempNode.value);
+      return tempNode.value;
+    }
+  
+    /**
+     * 中序遍历AVL
+     */
+    infixOrder(node) {
+      if (this.root == null) return;
+      if (node == null) return;
+      if (node.left !== null) this.infixOrder(node.left);
+      console.log("中序遍历权值为：", node.value);
+      if (node.right !== null) this.infixOrder(node.right);
+    }
+  }
+  
+  let arr = [4, 3, 6, 5, 7, 8]; // 左
+  let arr1 = [10, 12, 8, 9, 7, 6]; // 右旋转
+  let avl = new AVL();
+  avl.createAVL(arr1);
+  console.log("树的高度为：", avl.getRoot().getHeight());
+  console.log("左子树的高度为：", avl.getRoot().getLeftHeight());
+  console.log("右子树的高度为：", avl.getRoot().getRightHeight());
+  
+  ```
+
+
+
+### 多路查找树
+
+#### 二叉树问题分析
+
+<img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\BinaryTreeProblem.png" style="zoom: 67%;" />
+
+
+
+#### 2-3树
+
+- 2-3树是最简单的B树结构，具有如下特点
+
+  1. 2-3树的所有叶子节点都在同一层（只要是B树都满足这个条件）
+  2. 有两个子节点的节点叫二节点，二节点要么没有子节点，要么有两个子节点
+  3. 有三个子节点的节点叫三节点，三节点要么没有子节点，要么有三个子节点
+  4. 2-3树是由二节点和三节点构成的树
+
+  <img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\2-3Tree.png" style="zoom:67%;" />
+
+
+
+#### B树
+
+<img src="C:\Users\Administrator\Desktop\数据结构和算法\img\树\BTree.png" style="zoom:67%;" />
+
+
+
+
+
+## 图
+
