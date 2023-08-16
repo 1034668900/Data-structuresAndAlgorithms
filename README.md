@@ -5010,12 +5010,151 @@ graph.showEdges()
   2. 如果失败（即str1[i] != str2[j]）,令i = i - (j - 1), j = 0。相当于每次匹配失败时，i回溯，j被置零。
 - **问题分析**：用暴力匹配方法解决就会出现大量回溯，每次只移动一位ie，若是不匹配，移动到下一位接着判断，浪费了大量时间。
 
+- **代码实现**：
 
+  ```j
+  /**
+   * 暴力匹配算法
+   * @param {String} str1 待匹配的串
+   * @param {String} str2 匹配的关键词
+   * @return 匹配成功返回开始的索引，失败返回-1
+   */
+  function violenceMatch(str1, str2) {
+    let str1Arr = str1.split(""),
+      str2Arr = str2.split("");
+  
+    // 两个数组的长度
+    let str1Len = str1Arr.length,
+      str2Len = str2Arr.length;
+    // 两个数组的索引
+    let str1Index = 0,
+      str2Index = 0;
+  
+    // 循环匹配
+    while(str1Index<str1Len && str2Index<str2Len){
+      if(str1Arr[str1Index] == str2Arr[str2Index]){
+          // 当前项匹配成功
+          if(str2Index== str2Len-1){
+              // 匹配完成
+              return str1Index-str2Index
+          }
+          str1Index++
+          str2Index++
+      }else{
+          // 匹配失败则回溯
+          str1Index = str1Index-(str2Index-1)
+          str2Index = 0
+      }
+    }
+    return -1
+  }
+  
+  let str1 = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
+  let str2 = '甜蜜蜜'
+  console.log(violenceMatch(str1,str2));// 12
+  ```
+
+  
 
 ### KMP算法介绍
 
 - KMP算法是一个解决模式串在文本串中是否出现过，如果出现过，返回其最早出现的位置的经典算法
+
 - Kunh-Morris-Pratt字符串查找算法，简称”KMP算法“，常用于在一个文本串S内查找一个模式串P的出现位置，这个算法由Donald Knuth、Vaughan Pratt、James J. Morris三人于1977年联合发表，故取这3人的姓氏命名此算法
+
 - KMP算法就是利用之前判断过的信息，通过一个next数组，保存模式串中前后最长公共子序列的长度，每次回溯时，通过next数组找到前面匹配过的位置，省去了大量的计算时间。
+
 - **KMP算法的最大特点就是主串的索引不会回溯，只有模板串的索引会回溯**
 
+- **代码实现**：
+
+  ```js
+  /**
+   * 获取字符串的部分匹配表
+   * @param {Array} strArr
+   */
+  function kmpNext(str) {
+    // next数组用于保存部分匹配值(字符串长度为0时部分匹配值一定为0)
+    let next = [0];
+    for (let i = 1, j = 0; i < str.length; i++) {
+      // 当str.charAt(i) == str.charAt(j)不满足时，需要从next[j-1]获取新的j
+      // 直到发现有 str.charAt(i) == str.charAt(j) 成立才退出
+      while (j > 0 && str.charAt(i) != str.charAt(j)) {
+        j = next[j - 1];
+      }
+      // 当str.charAt(i) == str.charAt(j)满足时，部分匹配值+1
+      if (str.charAt(i) == str.charAt(j)) {
+        j++;
+      }
+      next[i] = j;
+    }
+    return next
+  }
+  
+  /**
+   * KMP匹配算法
+   * @param {*} qStr
+   * @param {*} pStr
+   * @param {*} next 部分匹配表
+   */
+  function kmpSearch(qStr, pStr, next) {
+    for (let i = 0, j = 0; i < qStr.length; i++) {
+      // 处理 qStr.charAt(i) !== pStr.charAt(j)的情况来调整j的大小
+      while (j > 0 && qStr.charAt(i) !== pStr.charAt(j)) {
+        j = next[j - 1];
+      }
+      if(qStr.charAt(i) === pStr.charAt(j)){
+          j++
+      }
+      // 找到了的情况
+      if(j == pStr.length){
+          return i-(j-1)
+      }
+    }
+    return -1
+  }
+  
+  
+  let qStr = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
+  let pStr = '我爱你'
+  console.log(kmpSearch(qStr,pStr,kmpNext(pStr)));// 12
+  ```
+
+
+
+## 贪心算法
+
+### 贪心算法介绍
+
+- 贪心算法是指在对问题进行求解时，在每一步选择中都采取最好或者最优的选择，从而希望能够导致结果是最好或者最优的算法
+- 贪婪算法所得到的结果**不一定是最优的结果**（有时候会是最优解），但是都是相对近似最优解的结果
+
+### 贪心算法最佳应用-集合覆盖
+
+- **问题说明**
+
+> 假设存在如下表的需要付费的广播台，以及广播台信号可以覆盖的地区。如何选择最少的广播台，让所有的地区都可以接收到信号
+
+| 广播台 | 覆盖地区               |
+| ------ | ---------------------- |
+| K1     | "北京"、"上海"、"天津" |
+| K2     | "广州"、"北京"、"深圳" |
+| K3     | "成都"、"上海"、"杭州" |
+| K4     | "上海"、"天津"         |
+| K5     | "杭州"、"大连"         |
+
+- **穷举法思路分析**
+
+> 如何找出覆盖所有地区的广播台的集合呢？可以使用穷举法实现，列出每个可能的广播台的集合，这被称为幂集。假设总的有n个广播台，则广播台的组合总共有2^n  -1 个，假设每秒可以计算10个子集，如图：
+
+| 广播台数量n | 子集总数2^n | 需要的时间  |
+| ----------- | ----------- | ----------- |
+| 5           | 32          | 3.2秒       |
+| 10          | 1024        | 102.4秒     |
+| 32          | 4294967296  | 13.6年      |
+| 100         | 1.26*100^30 | 4*10^23  年 |
+
+- **贪心算法思路分析**
+  1. 遍历所有的广播电台，找到一个覆盖了最多**未覆盖的地区**的电台（此电台可能包含一些已覆盖的地区，但没有关系）
+  2. 将这个电台加入到一个集合中（比如ArrayList），想办法**把该电台覆盖的地区在下次比较时去掉**
+  3. 重复第1步直到覆盖了全部的地区

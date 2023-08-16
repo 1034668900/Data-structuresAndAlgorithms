@@ -11,7 +11,6 @@ function kmpNext(str) {
     while (j > 0 && str.charAt(i) != str.charAt(j)) {
       j = next[j - 1];
     }
-
     // 当str.charAt(i) == str.charAt(j)满足时，部分匹配值+1
     if (str.charAt(i) == str.charAt(j)) {
       j++;
@@ -23,21 +22,21 @@ function kmpNext(str) {
 
 /**
  * KMP匹配算法
- * @param {*} str1
- * @param {*} str2
+ * @param {*} qStr
+ * @param {*} pStr
  * @param {*} next 部分匹配表
  */
-function kmpSearch(str1, str2, next) {
-  for (let i = 0, j = 0; i < str1.length; i++) {
-    // 处理 str1.charAt(i) !== str2.charAt(j)的情况来调整j的大小
-    while (j > 0 && str1.charAt(i) !== str2.charAt(j)) {
+function kmpSearch(qStr, pStr, next) {
+  for (let i = 0, j = 0; i < qStr.length; i++) {
+    // 处理 qStr.charAt(i) !== pStr.charAt(j)的情况来调整j的大小
+    while (j > 0 && qStr.charAt(i) !== pStr.charAt(j)) {
       j = next[j - 1];
     }
-    if(str1.charAt(i) === str2.charAt(j)){
+    if(qStr.charAt(i) === pStr.charAt(j)){
         j++
     }
     // 找到了的情况
-    if(j == str2.length){
+    if(j == pStr.length){
         return i-(j-1)
     }
   }
@@ -45,6 +44,6 @@ function kmpSearch(str1, str2, next) {
 }
 
 
-let str1 = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
-let str2 = '我爱你'
-console.log(kmpSearch(str1,str2,kmpNext(str2)));// 12
+let qStr = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
+let pStr = '我爱你'
+console.log(kmpSearch(qStr,pStr,kmpNext(pStr)));// 12
