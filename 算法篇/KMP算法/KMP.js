@@ -5,6 +5,7 @@
 function kmpNext(str) {
   // next数组用于保存部分匹配值(字符串长度为0时部分匹配值一定为0)
   let next = [0];
+  // i代表的是后缀，j代表的是前缀
   for (let i = 1, j = 0; i < str.length; i++) {
     // 当str.charAt(i) == str.charAt(j)不满足时，需要从next[j-1]获取新的j
     // 直到发现有 str.charAt(i) == str.charAt(j) 成立才退出
