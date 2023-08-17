@@ -5,6 +5,7 @@
 function kmpNext(str) {
   // next数组用于保存部分匹配值(字符串长度为0时部分匹配值一定为0)
   let next = [0];
+  // i代表的是后缀，j代表的是前缀
   for (let i = 1, j = 0; i < str.length; i++) {
     // 当str.charAt(i) == str.charAt(j)不满足时，需要从next[j-1]获取新的j
     // 直到发现有 str.charAt(i) == str.charAt(j) 成立才退出
@@ -44,6 +45,12 @@ function kmpSearch(qStr, pStr, next) {
 }
 
 
+<<<<<<< HEAD
 let qStr = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
 let pStr = '我爱你'
 console.log(kmpSearch(qStr,pStr,kmpNext(pStr)));// 12
+=======
+let str1 = '你爱我 我爱你 蜜雪冰城甜蜜蜜'
+let str2 = '我爱你'
+console.log(kmpSearch(str1,str2,kmpNext(str2)));// 12
+>>>>>>> 67d127e04ffe5315a1e4746e9c1ed3e5221b49cc
